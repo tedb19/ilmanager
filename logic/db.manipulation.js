@@ -19,3 +19,8 @@ export const getEntityFromSubscription = async (subscription) => {
     const entity = await models.Entity.findById(subscription.EntityId)
     return entity
 }
+
+export const getMessageTypeObj = async (messageTypeName) => {
+    const [ messageType ] = await models.MessageType.findAll({ where: { verboseName: messageTypeName }})
+    return messageType
+}

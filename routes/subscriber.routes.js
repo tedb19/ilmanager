@@ -2,7 +2,7 @@ import Boom from 'boom'
 
 import models from '../models'
 import { log } from '../utils/log.utils'
-import { getSubscribedEntities } from '../logic/db.manipulation'
+import { getSubscribedEntities, getMessageTypeObj } from '../logic/db.manipulation'
 
 exports.register = (server, options, next) => {
 
@@ -11,14 +11,13 @@ exports.register = (server, options, next) => {
         method: 'GET',
         handler: async (request, reply) => {
             try{
-                const [ messageType ] = await models.MessageType.findAll({ where: { verboseName: request.params.messageType }})
+                const messageType = await getMessageTypeObj(request.params.messageType)
                 const entities = await getSubscribedEntities(messageType)
                 reply(entities)
             } catch (error) {
                 log.error(error)
                 reply(Boom.badImplementation)
             }
-            
         },
         config: {
             description: 'Get the entities that have subscribed to a given message type',
