@@ -1,0 +1,20 @@
+{
+  "development": {
+    "username": "root",
+    "password": "maun2806;",
+    "database": "interopdb_dev",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "test": {
+    "dialect": "sqlite",
+    "storage": ":memory:"
+  },
+  "production": {
+    "username": "root",
+    "password": "maun2806;",
+    "database": "interopdb_prod",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}
