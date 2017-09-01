@@ -2,5 +2,13 @@
 import entityRoutes from './entity.routes'
 import messageTypeRoutes from './messagetype.routes'
 import subscriberRoutes from './subscriber.routes'
+import statsRoutes from './stats.routes'
+import logsRoutes from './logs.routes'
 
-export const routesPlugins = [{ register: entityRoutes }, { register: messageTypeRoutes }, { register: subscriberRoutes }]
+export const routesPlugins = [
+    { register: entityRoutes },
+    { register: messageTypeRoutes },
+    { register: subscriberRoutes },
+    { register: statsRoutes },
+    { register: logsRoutes }
+]

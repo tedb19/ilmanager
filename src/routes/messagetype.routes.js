@@ -17,7 +17,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Get the message types',
             tags: ['message types', 'hl7'],
-            notes: 'should return all the message types'
+            notes: 'should return all the message types',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 
@@ -33,7 +37,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Get the message type with the specified id',
             tags: ['message types', 'hl7'],
-            notes: 'should return the message type with the specified id'
+            notes: 'should return the message type with the specified id',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 
@@ -49,7 +57,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Create a new message type',
             tags: ['message types', 'hl7'],
-            notes: 'should return the created message type'
+            notes: 'should return the created message type',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 
@@ -66,7 +78,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Updates an existing message type',
             tags: ['message type', 'hl7'],
-            notes: 'should return the updated message type'
+            notes: 'should return the updated message type',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 

@@ -11,7 +11,17 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(20),
       allowNull: true
     },
-    description: DataTypes.TEXT
+    description: DataTypes.TEXT,
+    status: {
+      type:   DataTypes.ENUM,
+      values: ['ACTIVE', 'INACTIVE'],
+      defaultValue: 'INACTIVE'
+    },
+    color: {
+      type:   DataTypes.ENUM,
+      values: ["teal", "violet", "pink", "yellow", "purple", "green", "orange", "gray"],
+      defaultValue: 'gray'
+  }
   })
   
   Entity.associate = function(models) {

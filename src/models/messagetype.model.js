@@ -12,7 +12,12 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       unique: true
     },
-    description: DataTypes.TEXT
+    description: DataTypes.TEXT,
+    status: {
+        type:   DataTypes.ENUM,
+        values: ['ACTIVE', 'INACTIVE'],
+        defaultValue: 'ACTIVE'
+    }
   })
 
   MessageType.associate = function(models) {

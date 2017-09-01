@@ -3,7 +3,7 @@ import models from '../models'
 export const seedMessageTypes = () => models.MessageType.bulkCreate(messageTypes)
 
 const messageTypes = [
-    { id: 1, name: 'ADT^A04', verboseName: 'PADIENT_REGISTRATION',  description: 'The patient registration message.'},
+    { id: 1, name: 'ADT^A04', verboseName: 'PATIENT_REGISTRATION',  description: 'The patient registration message.'},
     { id: 2, name: 'ADT^A08', verboseName: 'PATIENT_UPDATE',  description: 'An update to the patient demographic details'},
     { id: 3, name: 'RDE^001', verboseName: 'PHARMACY_ORDER',  description: 'Drug prescription message. Also used when cancelling a drug prescription'},
     { id: 4, name: 'RDS^O13', verboseName: 'PHARMACY_DISPENSE',  description: 'Message used when dispensing drugs'},

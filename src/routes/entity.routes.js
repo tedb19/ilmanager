@@ -17,7 +17,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Get the entities',
             tags: ['entity', 'entities', 'participating systems'],
-            notes: 'should return all the entities'
+            notes: 'should return all the entities',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 
@@ -33,7 +37,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Get the entity with the specified id',
             tags: ['entity', 'participating system'],
-            notes: 'should return the entity with the specified id'
+            notes: 'should return the entity with the specified id',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 
@@ -48,7 +56,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Get the message types that the supplied entity subscribed to, including the status of the subscription',
             tags: ['entity\'s subscriptions', 'participating system\'s message types'],
-            notes: 'should return the message types subscribed to by the supplied entity'
+            notes: 'should return the message types subscribed to by the supplied entity',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 
@@ -64,7 +76,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Create a new entity',
             tags: ['entity', 'participating system'],
-            notes: 'should return the created entity'
+            notes: 'should return the created entity',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 
@@ -81,7 +97,11 @@ exports.register = (server, options, next) => {
         config: {
             description: 'Updates an existing entity',
             tags: ['entity', 'participating system'],
-            notes: 'should return the updated entity'
+            notes: 'should return the updated entity',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
         }
     })
 

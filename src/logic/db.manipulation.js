@@ -5,13 +5,13 @@ import { log } from '../utils/log.utils'
 
 export const getSubscribedEntities = async (messageType) => {
     const messaegTypeId = messageType.id
-    const entities = await messageType.getEntities({attributes: ['name','description']})
+    const entities = await messageType.getEntities({attributes: ['name','description', 'color']})
     return entities
 }
 
 export const getSubscribedMessageTypes = async (entity) => {
     const entityId = entity.id
-    const messageTypes = await entity.getMessageTypes({attributes: ['name','description']})
+    const messageTypes = await entity.getMessageTypes({attributes: ['name','description', 'verboseName']})
     return messageTypes
 }
 
