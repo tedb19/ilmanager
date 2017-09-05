@@ -6,3 +6,5 @@ export const loutPluginObj = [Vision, Inert,{
     register: Lout,
     options: { endpoint: '/docs' }
 }]
+
+export const InertPluginObj = { register: Inert }
