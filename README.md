@@ -1,7 +1,7 @@
 # ILManager
 
 ## Description
-  - This is the REST API for the IL, with endpoints for getting the `Participating Systems`, `Message Types`,<br>
+  - This is the REST API for the IL, with endpoints for getting the `Participating Systems`, `Message Types`,<br/>
    `Message Subscriptions`, `Usage Stats` and `Notifications`
 
 ## Setup steps
