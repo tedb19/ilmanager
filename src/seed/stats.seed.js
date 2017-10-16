@@ -13,9 +13,10 @@ export const stats = [
     {id: 7, name: 'LAB_RESULT_MESSAGETYPE', value: '0', description: ''},
 
     /** Message Status */
-    {id: 8, name: 'SENT', value: '100', description: ''},
-    {id: 9, name: 'QUEUED', value: '55', description: ''},
-    {id: 10, name: 'ERRORED', value: '45', description: ''},
+    {id: 8, name: 'SENT', value: '0', description: ''},
+    {id: 9, name: 'QUEUED', value: '0', description: ''},
+    {id: 10, name: 'ERRORED', value: '0', description: ''},
+    {id: 23, name: 'RECEIVED', value: '0', description: ''},
 
     /** Entities Online */
     {id: 11, name: 'ADT_STATUS', value: 'offline', description: ''},
@@ -27,9 +28,11 @@ export const stats = [
     {id: 17, name: 'MPI_STATUS', value: 'offline', description: ''},
 
     /** Daily Traffic */
-    {id: 18, name: 'MON', value: '', description: ''},
-    {id: 19, name: 'TUE', value: '', description: ''},
-    {id: 20, name: 'WED', value: '', description: ''},
-    {id: 21, name: 'THUR', value: '', description: ''},
-    {id: 22, name: 'FRI', value: '', description: ''}
+    {id: 18, name: 'MON', value: '0', description: ''},
+    {id: 19, name: 'TUE', value: '0', description: ''},
+    {id: 20, name: 'WED', value: '0', description: ''},
+    {id: 21, name: 'THUR', value: '0', description: ''},
+    {id: 22, name: 'FRI', value: '0', description: ''},
+    {id: 24, name: 'SUN', value: '0', description: ''},
+    {id: 25, name: 'SAT', value: '0', description: ''},
 ]

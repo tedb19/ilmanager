@@ -33,5 +33,11 @@ const messageSubscribers = [
 
     /** MPI */
     { EntityId: 7, MessageTypeId: 1},
-    { EntityId: 7, MessageTypeId: 2}
+    { EntityId: 7, MessageTypeId: 2},
+
+    /** DHIS2 */
+    { EntityId: 8, MessageTypeId: 8},
+
+    /** DATIM */
+    { EntityId: 9, MessageTypeId: 8}
 ]

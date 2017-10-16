@@ -7,10 +7,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       unique: true
     },
-    address:  {
-      type: DataTypes.STRING(20),
-      allowNull: true
-    },
     description: DataTypes.TEXT,
     status: {
       type:   DataTypes.ENUM,
@@ -19,13 +15,17 @@ module.exports = function(sequelize, DataTypes) {
     },
     color: {
       type:   DataTypes.ENUM,
-      values: ["teal", "violet", "pink", "yellow", "purple", "green", "orange", "gray"],
-      defaultValue: 'gray'
+      values: ["teal", "violet", "pink", "yellow", "brown", "purple", "green", "orange", "blue", "red", "olive", "grey", "black"],
+      defaultValue: 'grey'
   }
   })
   
   Entity.associate = function(models) {
     Entity.belongsToMany(models.MessageType, {through: models.Subscriber})
+  }
+
+  Entity.associate = function(models) {
+    Entity.hasMany(models.AddressMapping)
   }
   
   return Entity

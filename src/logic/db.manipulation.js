@@ -10,8 +10,15 @@ export const getSubscribedEntities = async (messageType) => {
 }
 
 export const getSubscribedMessageTypes = async (entity) => {
-    const entityId = entity.id
-    const messageTypes = await entity.getMessageTypes({attributes: ['name','description', 'verboseName']})
+    const EntityId = entity.id
+    const entitySubscriptions = await models.Subscriber.findAll({ where: { EntityId }})
+    let messageTypes = []
+    for(let entitySubscription of entitySubscriptions){
+        const [messageType] = await models.MessageType.findAll({ where: { id: entitySubscription.dataValues.MessageTypeId }})
+        console.log('messageType', messageType)
+        messageTypes.push(messageType)
+    }
+    
     return messageTypes
 }
 

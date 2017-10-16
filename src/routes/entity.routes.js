@@ -3,18 +3,30 @@ import Boom from 'boom'
 import models from '../models'
 import { log } from '../utils/log.utils'
 import { getSubscribedMessageTypes } from '../logic/db.manipulation'
+import { createHash } from '../utils/hashing.utils'
 
 exports.register = (server, options, next) => {
     server.route({
         path: '/entities',
         method: 'GET',
-        handler: (request, reply) => {
-            models.Entity
-                .findAll()
-                .then(entities => reply(entities))
-                .catch(error => log.error(error))
+        handler: async (request, reply) => {
+            let entities = []
+            try{
+                entities = await models.Entity.findAll({
+                    include: [{
+                        model: models.AddressMapping,
+                        attributes: ['protocol', 'address', 'status', 'updatedAt']
+                    }]
+                })
+            }catch(error){console.log}      
+            
+            reply(entities)
         },
         config: {
+            cache: {
+                expiresIn: 300 * 1000,
+                privacy: 'private'
+            },
             description: 'Get the entities',
             tags: ['entity', 'entities', 'participating systems'],
             notes: 'should return all the entities',
@@ -28,11 +40,9 @@ exports.register = (server, options, next) => {
     server.route({
         path: '/entities/{id}',
         method: 'GET',
-        handler: (request, reply) => {
-            models.Entity
-                .findById(request.params.id)
-                .then((entity) => entity ?  reply(entity) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+        handler: async (request, reply) => {
+            const entity = await models.Entity.findById(request.params.id)
+            entity ?  reply(entity) : reply(Boom.notFound)
         },
         config: {
             description: 'Get the entity with the specified id',
@@ -67,11 +77,15 @@ exports.register = (server, options, next) => {
     server.route({
         path: '/entities',
         method: 'POST',
-        handler: (request, reply) => {
-            models.Entity
-                .create(request.payload)
-                .then((entity) => entity ?  reply(entity) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+        handler: async (request, reply) => {
+            let newEntity = request.payload
+            try{
+                const entity = await models.Entity.create(newEntity)
+                entity ?  reply(entity) : reply(Boom.notFound)
+            } catch(err) {
+                console.log(err)
+                reply(Boom.notFound)
+            }
         },
         config: {
             description: 'Create a new entity',
@@ -87,12 +101,11 @@ exports.register = (server, options, next) => {
     server.route({
         path: '/entities/{id}',
         method: 'PUT',
-        handler: (request, reply) => {
+        handler: async (request, reply) => {
             const entityId = request.params.id 
-            models.Entity
-                .update(request.payload, {where: { id: entityId } }) 
-                .then((entity) => entity ?  reply(entity) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+            let postBody = request.payload
+            const entity = await models.Entity.update(postBody, {where: { id: entityId } })
+            entity ?  reply(entity) : reply(Boom.notFound)
         },
         config: {
             description: 'Updates an existing entity',

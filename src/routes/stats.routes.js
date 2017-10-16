@@ -10,8 +10,8 @@ exports.register = (server, options, next) => {
         path: '/stats/',
         method: 'GET',
         handler: async (request, reply) => {
-            const entitiesOnline = await getEntitiesStatus()
-            let stats = { entitiesOnline }
+            const data = await getEntitiesStatus()
+            let stats = { data }
             reply(stats)
         },
         config: {
@@ -25,6 +25,29 @@ exports.register = (server, options, next) => {
         }
     })
 
+    server.route({
+        path: '/stats/',
+        method: 'POST',
+        handler: async (request, reply) => {
+            let newStat = request.payload
+            try{
+                const stat = await models.Stats.create(newStat)
+                stat ?  reply(stat) : reply(Boom.notFound)
+            } catch(err) {
+                console.log(err)
+                reply(Boom.notFound)
+            }
+        },
+        config: {
+            description: 'Create a new stat',
+            tags: ['stats'],
+            notes: 'should return the created stat',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
+        }
+    })
     return next()
 }
 

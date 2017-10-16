@@ -8,25 +8,20 @@ exports.register = (server, options, next) => {
     server.route({
         path: '/logs/{page}',
         method: 'GET',
-        handler: (req, reply) => {
+        handler: async (req, reply) => {
             let page = req.params.page;      // page number
-            let limit = 10;   // number of records per page
+            let limit = 15;   // number of records per page
             let offset = page * limit;
                 
-            models.Logs.findAndCountAll({
-                limit: limit,
-                offset: offset,
-                order: [ ['createdAt', 'DESC']],
+            const data = await models.Logs.findAndCountAll({
+                limit, offset,
+                order: [ ['id', 'DESC']],
                 $sort: { id: 1 }
-            }).then((data) => {
-                let pages = Math.ceil(data.count / limit);
-                    offset = limit * (page - 1);
-                let logs = data.rows;
-                reply({'result': logs, 'count': data.count, 'pages': pages})
             })
-            .catch(function (error) {
-                console.log(error)
-            })
+            const pages = Math.ceil(data.count / limit)
+            offset = limit * (page - 1)
+            const logs = data.rows
+            reply({'result': logs, 'count': data.count, 'pages': pages})
         },
         config: {
             description: 'Get the logs',

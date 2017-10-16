@@ -9,5 +9,6 @@ const messageTypes = [
     { id: 4, name: 'RDS^O13', verboseName: 'PHARMACY_DISPENSE',  description: 'Message used when dispensing drugs'},
     { id: 5, name: 'SIU^S12', verboseName: 'APPOINTMENT_SCHEDULING',  description: 'Message used when scheduling appointments. Also used when rescheduling, cancelling an appointment, and showing that an appointment was honored'},
     { id: 6, name: 'ORM^O01', verboseName: 'LAB_ORDER',  description: 'Message used when sending a lab order, e.g. a Viral Load Lab Order'},
-    { id: 7, name: 'ORU^R01', verboseName: 'LAB_RESULT',  description: 'Message used when sending a lab result e.g. Viral Load Results'}
+    { id: 7, name: 'ORU^R01', verboseName: 'OBSERVATION_RESULT_UNSOLICITED',  description: 'This message is generated for any observation that needs to be shared. It\'s also used to transmit the lab results to the subscribed systems'},
+    { id: 8, name: 'MOH731^ADX', verboseName: 'MOH_731_ADX',  description: 'ADX is an international standard for aggregate data exchange. The MOH 731 message contains aggregate level data for reporting to both DHIS and DATIM'},
 ]

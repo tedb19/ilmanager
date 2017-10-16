@@ -6,10 +6,12 @@ import { utilsPlugins } from '../utils'
 import { routesPlugins } from '../routes'
 import { initializeDb } from '../seed'
 import { updateEntitiesStatus } from '../logic/stats.logic'
+import { checkSystemsStatus } from '../logic/stats.logic'
+
 
 const server = module.exports = new Hapi.Server();
 
-server.connection({ port: 3002 })
+server.connection({ port: 3003 })
 
 const plugins = [ ...utilsPlugins, ...routesPlugins ]
 
@@ -18,11 +20,12 @@ server.register(plugins, (error) => {
     
     server.initialize((error) => {
         if (error) throw error
-        initializeDb(false)
+        initializeDb()
             .then(() => {
                 server.start((error) => {
                     if (error) throw error
                     log.info(`Server started @ ${server.info.uri}`)
+                    checkSystemsStatus.start()
                 })
             })
             .catch(error => log.error(error))

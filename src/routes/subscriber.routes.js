@@ -44,6 +44,7 @@ exports.register = (server, options, next) => {
                 const messageSubscribers = []
                 for(let entity of entities){
                     const messageTypesObjs = await getSubscribedMessageTypes(entity)
+                    console.log('messageTypesObjs',messageTypesObjs)
                     const messageTypes = messageTypesObjs.map(messageType => messageType.verboseName)
                     messageSubscribers.push({ entity: entity.name, messageTypes })
                 }
