@@ -3,7 +3,7 @@ import { log } from '../utils/log.utils'
 import ping from 'ping'
 import { CronJob } from 'cron'
 
-const getActiveEntities = async () => {
+export const getActiveEntities = async () => {
     let addresses = []
     try{
         let entities = await models.Entity.findAll()
@@ -13,14 +13,13 @@ const getActiveEntities = async () => {
             addresses.push({name: entity.name, address: addressMapping[0].dataValues.address})
         }
     } catch(error) {
-        log.error(error)
+        server.log(['app', 'error'], error)
     }
     return addresses
 }
 
 export const updateEntitiesStatus = async () => {
     const clients = await getActiveEntities()
-    console.log('clients', clients)
     clients.forEach(client => {
         
        ping.sys.probe(client.address.split(':')[0], (isAlive) => {
@@ -30,8 +29,8 @@ export const updateEntitiesStatus = async () => {
                 where: { 
                     name: `${client.name}_STATUS`
                 }
-          }).then(response => console.log(`${client.name} status updated successfully`))
-          .catch(console.log)
+          }).then(response => response)
+          .catch(error => server.log(['app', 'error'], error))
        })
     })
 }
@@ -39,7 +38,6 @@ export const updateEntitiesStatus = async () => {
 export const checkSystemsStatus = new CronJob({
     cronTime: '* * * * *',
     onTick: async () => {
-        console.log('checking status now...')
         await updateEntitiesStatus()
     },
     start: false,

@@ -10,6 +10,7 @@ const messageSubscribers = [
     { EntityId: 1, MessageTypeId: 5},
     { EntityId: 1, MessageTypeId: 6},
     { EntityId: 1, MessageTypeId: 7},
+    { EntityId: 1, MessageTypeId: 9},
 
     /** KENYAEMR */
     { EntityId: 2, MessageTypeId: 1},
@@ -18,6 +19,7 @@ const messageSubscribers = [
     { EntityId: 2, MessageTypeId: 5},
     { EntityId: 2, MessageTypeId: 6},
     { EntityId: 2, MessageTypeId: 7},
+    { EntityId: 2, MessageTypeId: 9},
 
     /** ADT */
     { EntityId: 3, MessageTypeId: 1},
@@ -25,6 +27,7 @@ const messageSubscribers = [
     { EntityId: 3, MessageTypeId: 3},
     { EntityId: 3, MessageTypeId: 5},
     { EntityId: 3, MessageTypeId: 7},
+    { EntityId: 3, MessageTypeId: 9},
 
     /** T4A */
     { EntityId: 4, MessageTypeId: 1},

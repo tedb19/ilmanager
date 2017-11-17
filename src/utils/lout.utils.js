@@ -4,7 +4,7 @@ import Inert from 'inert'
 
 export const loutPluginObj = [Vision, Inert,{
     register: Lout,
-    options: { endpoint: '/docs' }
+    options: { endpoint: '/api/docs' }
 }]
 
 export const InertPluginObj = { register: Inert }

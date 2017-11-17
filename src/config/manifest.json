@@ -1,0 +1,79 @@
+{
+  "server": {
+    "app": {
+      "slogan": "Interoperability Layer for the HIS projects"
+    }
+  },
+  "connections": [
+    {
+      "port": 5000,
+      "labels": ["web-ui", "IL"]
+    },
+    {
+      "port": 3003,
+      "labels": ["api", "IL"]
+    },
+    {
+      "port": 3007,
+      "labels": ["VL"]
+    }
+  ],
+  "registrations": [
+    {
+      "plugins": {
+        "register": "good",
+        "options": {
+          "opsInterval": 5000,
+          "reporters": {
+            "console": [
+              {
+                "module": "good-squeeze",
+                "name": "Squeeze",
+                "args": [{
+                  "log": "*",
+                  "response": "*"
+                }]
+              },{
+                "module": "good-console"
+              }, "stdout" 
+            ],
+            "file": [
+              {
+                "module": "good-squeeze",
+                "name": "Squeeze",
+                "args": [{ "ops": "*", "log": "*", "response": "*", "request": "*", "error": "*" }]
+              },
+              {
+                "module": "good-squeeze",
+                "name": "SafeJson",
+                "args": [ null, { "separator": ",\n" } ]
+              },
+              {
+                "module": "rotating-file-stream",
+                "args": [
+                  "ops_log.json",
+                  {
+                    "size": "300K",
+                    "path": "./logs"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    { "register": "blipp" },
+    { "register": "inert" },
+    { "register": "vision" },
+    { "register": "lout", "options": { "endpoint": "/api/docs" }},
+    //routes
+    { "register": "../routes/addressmapping.routes"},
+    { "register": "../routes/entity.routes"},
+    { "register": "../routes/logs.routes"},
+    { "register": "../routes/messagetype.routes"},
+    { "register": "../routes/stats.routes"},
+    { "register": "../routes/subscriber.routes"},
+    { "register": "../routes/web.routes"}
+  ]
+}

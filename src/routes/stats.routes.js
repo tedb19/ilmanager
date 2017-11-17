@@ -7,7 +7,7 @@ import { getEntitiesStatus } from '../logic/stats.logic'
 
 exports.register = (server, options, next) => {
     server.route({
-        path: '/stats/',
+        path: '/api/stats/',
         method: 'GET',
         handler: async (request, reply) => {
             const data = await getEntitiesStatus()
@@ -26,7 +26,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/stats/',
+        path: '/api/stats/',
         method: 'POST',
         handler: async (request, reply) => {
             let newStat = request.payload

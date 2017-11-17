@@ -7,7 +7,7 @@ import { createHash } from '../utils/hashing.utils'
 
 exports.register = (server, options, next) => {
     server.route({
-        path: '/entities',
+        path: '/api/entities',
         method: 'GET',
         handler: async (request, reply) => {
             let entities = []
@@ -38,7 +38,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/entities/{id}',
+        path: '/api/entities/{id}',
         method: 'GET',
         handler: async (request, reply) => {
             const entity = await models.Entity.findById(request.params.id)
@@ -56,7 +56,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/entities/subscriptions/{entityName}',
+        path: '/api/entities/subscriptions/{entityName}',
         method: 'GET',
         handler: async (request, reply) => {
             const [ entity ] = await models.Entity.findAll({ where: { name: request.params.entityName }})
@@ -75,7 +75,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/entities',
+        path: '/api/entities',
         method: 'POST',
         handler: async (request, reply) => {
             let newEntity = request.payload
@@ -99,7 +99,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/entities/{id}',
+        path: '/api/entities/{id}',
         method: 'PUT',
         handler: async (request, reply) => {
             const entityId = request.params.id 

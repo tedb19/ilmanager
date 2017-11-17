@@ -11,7 +11,7 @@ import { checkSystemsStatus } from '../logic/stats.logic'
 
 const server = module.exports = new Hapi.Server();
 
-server.connection({ port: 3003 })
+server.connection({ port: 5000 })
 
 const plugins = [ ...utilsPlugins, ...routesPlugins ]
 
@@ -20,14 +20,14 @@ server.register(plugins, (error) => {
     
     server.initialize((error) => {
         if (error) throw error
-        initializeDb()
+        initializeDb(false)
             .then(() => {
                 server.start((error) => {
                     if (error) throw error
-                    log.info(`Server started @ ${server.info.uri}`)
+                    server.log(['app', 'info'], `Server started @ ${server.info.uri}`)
                     checkSystemsStatus.start()
                 })
             })
-            .catch(error => log.error(error))
+            .catch(error => server.log(['app', 'error'], error))
     })
 })

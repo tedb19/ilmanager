@@ -6,7 +6,7 @@ import { log } from '../utils/log.utils'
 exports.register = (server, options, next) => {
 
     server.route({
-        path: '/messagetypes',
+        path: '/api/messagetypes',
         method: 'GET',
         handler: (request, reply) => {
             models.MessageType
@@ -26,7 +26,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/messagetypes/{id}',
+        path: '/api/messagetypes/{id}',
         method: 'GET',
         handler: (request, reply) => {
             models.MessageType
@@ -46,7 +46,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/messagetypes',
+        path: '/api/messagetypes',
         method: 'POST',
         handler: (request, reply) => {
             models.MessageType
@@ -66,7 +66,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/messagetypes/{id}',
+        path: '/api/messagetypes/{id}',
         method: 'PUT',
         handler: (request, reply) => {
             const messageTypeId = request.params.id 

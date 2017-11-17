@@ -1,7 +1,6 @@
 import Boom from 'boom'
 
 import models from '../models'
-import { log } from '../utils/log.utils'
 
 export const getSubscribedEntities = async (messageType) => {
     const messaegTypeId = messageType.id
@@ -15,7 +14,6 @@ export const getSubscribedMessageTypes = async (entity) => {
     let messageTypes = []
     for(let entitySubscription of entitySubscriptions){
         const [messageType] = await models.MessageType.findAll({ where: { id: entitySubscription.dataValues.MessageTypeId }})
-        console.log('messageType', messageType)
         messageTypes.push(messageType)
     }
     

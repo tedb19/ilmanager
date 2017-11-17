@@ -7,7 +7,7 @@ import { getSubscribedEntities, getMessageTypeObj, getSubscribedMessageTypes } f
 exports.register = (server, options, next) => {
 
     server.route({
-        path: '/subscribers',
+        path: '/api/subscribers',
         method: 'GET',
         handler: async (request, reply) => {
             try{
@@ -36,7 +36,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/entitysubscriptions',
+        path: '/api/entitysubscriptions',
         method: 'GET',
         handler: async (request, reply) => {
             try{
@@ -66,7 +66,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/subscribers/{messageType}',
+        path: '/api/subscribers/{messageType}',
         method: 'GET',
         handler: async (request, reply) => {
             try{
@@ -90,7 +90,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/subscribers',
+        path: '/api/subscribers',
         method: 'POST',
         handler: (request, reply) => {
             models.Subscriber
@@ -110,7 +110,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/subscribers/{id}',
+        path: '/api/subscribers/{id}',
         method: 'PUT',
         handler: (request, reply) => {
             const messageTypeId = request.params.id 
@@ -131,7 +131,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/subscribers/{entityId}/{messageTypeId}',
+        path: '/api/subscribers/{entityId}/{messageTypeId}',
         method: 'DELETE',
         handler: async (request, reply) => {
             const messageTypeId = request.params.messageTypeId

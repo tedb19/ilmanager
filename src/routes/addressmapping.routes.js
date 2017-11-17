@@ -1,13 +1,13 @@
 import Boom from 'boom'
 
 import models from '../models'
-import { log } from '../utils/log.utils'
 import { getSubscribedMessageTypes } from '../logic/db.manipulation'
 import { createHash } from '../utils/hashing.utils'
+import { getActiveEntities } from '../logic/stats.logic'
 
 exports.register = (server, options, next) => {
     server.route({
-        path: '/addresses',
+        path: '/api/addresses',
         method: 'GET',
         handler: async (request, reply) => {            
             const addresses = await models.AddressMapping.findAll()
@@ -29,11 +29,34 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/addresses/{id}',
+        path: '/api/activeSystems',
         method: 'GET',
         handler: async (request, reply) => {
-            const address = await models.AddressMapping.findById(request.params.id)
-            address ?  reply(address) : reply(Boom.notFound)
+            const addresses = await getActiveEntities()
+            const addressNames = addresses.map(address => address.name)
+            reply(addressNames)
+        },
+        config: {
+            cache: {
+                expiresIn: 300 * 1000,
+                privacy: 'private'
+            },
+            description: 'Get the addresses',
+            tags: ['address', 'addresses'],
+            notes: 'should return all the addresses',
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
+        }
+    })
+
+    server.route({
+        path: '/api/addresses/{id}',
+        method: 'GET',
+        handler: async (request, reply) => {
+            const address = await models.AddressMapping.findAll({ where: { EntityId: request.params.id }})
+            address ?  reply(address) : reply({})
         },
         config: {
             description: 'Get the address with the specified id',
@@ -47,7 +70,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/addresses',
+        path: '/api/addresses',
         method: 'POST',
         handler: async (request, reply) => {
             try{
@@ -70,7 +93,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/addresses/{id}',
+        path: '/api/addresses/{id}',
         method: 'PUT',
         handler: async (request, reply) => {
             const addressMappingId = request.params.id 
@@ -92,7 +115,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/addresses/{entityId}',
+        path: '/api/addresses/{entityId}',
         method: 'DELETE',
         handler: async (request, reply) => {
             const EntityId = request.params.entityId

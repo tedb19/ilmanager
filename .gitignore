@@ -3,11 +3,15 @@
 # dependencies
 /node_modules
 
+# logs
+/logs
+
 # testing
 /coverage
 
 # production
 /dist
+/src/build
 
 # misc
 .DS_Store

@@ -6,7 +6,7 @@ import { getSubscribedMessageTypes } from '../logic/db.manipulation'
 
 exports.register = (server, options, next) => {
     server.route({
-        path: '/logs/{page}',
+        path: '/api/logs/{page}',
         method: 'GET',
         handler: async (req, reply) => {
             let page = req.params.page;      // page number
@@ -35,7 +35,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/logs/level/{level}/{page}',
+        path: '/api/logs/level/{level}/{page}',
         method: 'GET',
         handler: (request, reply) => {
             let page = request.params.page;      // page number
@@ -70,7 +70,7 @@ exports.register = (server, options, next) => {
     })
 
     server.route({
-        path: '/logs/search/{searchTerm}/{page}',
+        path: '/api/logs/search/{searchTerm}/{page}',
         method: 'GET',
         handler: (request, reply) => {
             let page = request.params.page;      // page number
@@ -106,7 +106,7 @@ exports.register = (server, options, next) => {
 
 
     server.route({
-        path: '/logs/count',
+        path: '/api/logs/count',
         method: 'GET',
         handler: (request, reply) => {
             models.Logs

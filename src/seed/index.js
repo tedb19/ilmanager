@@ -10,7 +10,7 @@ export const initializeDb = async (options = { force: true }) => {
     return await models
             .sequelize
             .sync(options)
-            .then(() => Promise.all([seedEntities(), seedMessageTypes(), seedStats(), seedaddressMappings()]))
+            .then(() => Promise.all([seedEntities(), seedMessageTypes(), seedStats()]))
             .then(() => seedSubscribers())
             .then(() => log.info('All seed data uploaded...'))
             .catch(error => log.error(error))
