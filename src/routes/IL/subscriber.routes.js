@@ -1,12 +1,13 @@
 import Boom from 'boom'
 
-import models from '../models'
-import { log } from '../utils/log.utils'
-import { getSubscribedEntities, getMessageTypeObj, getSubscribedMessageTypes } from '../logic/db.manipulation'
+import models from '../../models'
+import { getSubscribedEntities, getMessageTypeObj, getSubscribedMessageTypes } from '../../logic/db.manipulation'
 
 exports.register = (server, options, next) => {
 
-    server.route({
+    const ILServer = server.select('IL')
+
+    ILServer.route({
         path: '/api/subscribers',
         method: 'GET',
         handler: async (request, reply) => {
@@ -20,7 +21,7 @@ exports.register = (server, options, next) => {
                 }
                 reply(messageSubscribers)
             } catch (error) {
-                log.error(error)
+                server.log(['error', 'app'], `Error fetching subscribers: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -35,7 +36,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/entitysubscriptions',
         method: 'GET',
         handler: async (request, reply) => {
@@ -44,13 +45,12 @@ exports.register = (server, options, next) => {
                 const messageSubscribers = []
                 for(let entity of entities){
                     const messageTypesObjs = await getSubscribedMessageTypes(entity)
-                    console.log('messageTypesObjs',messageTypesObjs)
                     const messageTypes = messageTypesObjs.map(messageType => messageType.verboseName)
                     messageSubscribers.push({ entity: entity.name, messageTypes })
                 }
                 reply(messageSubscribers)
             } catch (error) {
-                log.error(error)
+                server.log(['error', 'app'], `Error fetching entity subscriptions: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -65,7 +65,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/subscribers/{messageType}',
         method: 'GET',
         handler: async (request, reply) => {
@@ -74,7 +74,7 @@ exports.register = (server, options, next) => {
                 const entities = await getSubscribedEntities(messageType)
                 reply(entities)
             } catch (error) {
-                log.error(error)
+                server.log(['error', 'app'], `Error fetching message type subscriptions: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -89,14 +89,17 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/subscribers',
         method: 'POST',
         handler: (request, reply) => {
             models.Subscriber
                 .create(request.payload)
                 .then((messagetype) => messagetype ?  reply(messagetype) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+                .catch(error => {
+                    server.log(['error', 'app'], `Error creating subscription: ${error}`)
+                    reply(Boom.badImplementation)
+                })
         },
         config: {
             description: 'Create a new subscription',
@@ -109,7 +112,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/subscribers/{id}',
         method: 'PUT',
         handler: (request, reply) => {
@@ -117,7 +120,10 @@ exports.register = (server, options, next) => {
             models.Subscriber
                 .update(request.payload, {where: { id: messageTypeId } }) 
                 .then((messageType) => messageType ?  reply(messageType) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+                .catch(error => {
+                    server.log(['error', 'app'], `Error updating subscription: ${error}`)
+                    reply(Boom.badImplementation)
+                })
         },
         config: {
             description: 'Updates an existing message type',
@@ -130,17 +136,21 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/subscribers/{entityId}/{messageTypeId}',
         method: 'DELETE',
         handler: async (request, reply) => {
             const messageTypeId = request.params.messageTypeId
             const entityId = request.params.entityId 
-            
-            await models.Subscriber.destroy({
-                 where: { EntityId: entityId, MessageTypeId: messageTypeId }
-            })
-            reply({ EntityId: entityId, MessageTypeId: messageTypeId })
+            try{
+                await models.Subscriber.destroy({
+                    where: { EntityId: entityId, MessageTypeId: messageTypeId }
+               })
+               reply({ EntityId: entityId, MessageTypeId: messageTypeId })
+            } catch(error) {
+                server.log(['error', 'app'], `Error deleting subscription: ${error}`)
+                reply(Boom.badImplementation)
+            }            
         },
         config: {
             description: 'Delete the subscription matching the entity and the message type',

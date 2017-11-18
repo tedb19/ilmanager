@@ -1,27 +1,33 @@
 import Boom from 'boom'
 
-import models from '../models'
-import { log } from '../utils/log.utils'
-import { getSubscribedMessageTypes } from '../logic/db.manipulation'
+import models from '../../models'
+import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
 
 exports.register = (server, options, next) => {
-    server.route({
+
+    const ILServer = server.select('IL')
+
+    ILServer.route({
         path: '/api/logs/{page}',
         method: 'GET',
         handler: async (req, reply) => {
             let page = req.params.page;      // page number
             let limit = 15;   // number of records per page
             let offset = page * limit;
-                
-            const data = await models.Logs.findAndCountAll({
-                limit, offset,
-                order: [ ['id', 'DESC']],
-                $sort: { id: 1 }
-            })
-            const pages = Math.ceil(data.count / limit)
-            offset = limit * (page - 1)
-            const logs = data.rows
-            reply({'result': logs, 'count': data.count, 'pages': pages})
+            try{
+                const data = await models.Logs.findAndCountAll({
+                    limit, offset,
+                    order: [ ['id', 'DESC']],
+                    $sort: { id: 1 }
+                })
+                const pages = Math.ceil(data.count / limit)
+                offset = limit * (page - 1)
+                const logs = data.rows
+                reply({'result': logs, 'count': data.count, 'pages': pages})
+            } catch (error) {
+                server.log(['error', 'app'], `Error fetching logs by page: ${error}`)
+                reply(Boom.badImplementation)
+            }
         },
         config: {
             description: 'Get the logs',
@@ -34,7 +40,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/logs/level/{level}/{page}',
         method: 'GET',
         handler: (request, reply) => {
@@ -54,8 +60,9 @@ exports.register = (server, options, next) => {
                 let logs = data.rows;
                 reply({'result': logs, 'count': data.count, 'pages': pages})
             })
-            .catch(function (error) {
-                console.log(error)
+            .catch (error => {
+                server.log(['error', 'app'], `Error fetching logs by log level and page: ${error}`)
+                reply(Boom.badImplementation)
             })
         },
         config: {
@@ -69,7 +76,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/logs/search/{searchTerm}/{page}',
         method: 'GET',
         handler: (request, reply) => {
@@ -89,8 +96,9 @@ exports.register = (server, options, next) => {
                 let logs = data.rows;
                 reply({'result': logs, 'count': data.count, 'pages': pages})
             })
-            .catch(function (error) {
-                console.log(error)
+            .catch (error => {
+                server.log(['error', 'app'], `Error searching for logs by search term and page: ${error}`)
+                reply(Boom.badImplementation)
             })
         },
         config: {
@@ -104,8 +112,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-
-    server.route({
+    ILServer.route({
         path: '/api/logs/count',
         method: 'GET',
         handler: (request, reply) => {
@@ -114,7 +121,10 @@ exports.register = (server, options, next) => {
                     attributes: [[models.sequelize.fn('COUNT', models.sequelize.col('id')), 'no_logs']]
                 })
                 .then(logs => reply(logs))
-                .catch(error => log.error(error))
+                .catch (error => {
+                    server.log(['error', 'app'], `Error fetching log count: ${error}`)
+                    reply(Boom.badImplementation)
+                })
         },
         config: {
             description: 'Get the logs count',
@@ -126,6 +136,7 @@ exports.register = (server, options, next) => {
             }
         }
     })
+
     return next()
 }
 

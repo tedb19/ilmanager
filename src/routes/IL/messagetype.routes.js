@@ -1,18 +1,22 @@
 import Boom from 'boom'
 
-import models from '../models'
-import { log } from '../utils/log.utils'
+import models from '../../models'
 
 exports.register = (server, options, next) => {
 
-    server.route({
+    const ILServer = server.select('IL')
+
+    ILServer.route({
         path: '/api/messagetypes',
         method: 'GET',
         handler: (request, reply) => {
             models.MessageType
                 .findAll()
                 .then(messageType => reply(messageType))
-                .catch(error => log.error(error))
+                .catch (error => {
+                    server.log(['error', 'app'], `Error fetching message types: ${error}`)
+                    reply(Boom.badImplementation)
+                })
         },
         config: {
             description: 'Get the message types',
@@ -25,14 +29,17 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/messagetypes/{id}',
         method: 'GET',
         handler: (request, reply) => {
             models.MessageType
                 .findById(request.params.id)
                 .then((messageType) => messageType ?  reply(messageType) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+                .catch (error => {
+                    server.log(['error', 'app'], `Error fetching message type by id: ${error}`)
+                    reply(Boom.badImplementation)
+                })
         },
         config: {
             description: 'Get the message type with the specified id',
@@ -45,14 +52,17 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/messagetypes',
         method: 'POST',
         handler: (request, reply) => {
             models.MessageType
                 .create(request.payload)
                 .then((messagetype) => messagetype ?  reply(messagetype) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+                .catch (error => {
+                    server.log(['error', 'app'], `Error creating message type: ${error}`)
+                    reply(Boom.badImplementation)
+                })
         },
         config: {
             description: 'Create a new message type',
@@ -65,7 +75,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/messagetypes/{id}',
         method: 'PUT',
         handler: (request, reply) => {
@@ -73,7 +83,10 @@ exports.register = (server, options, next) => {
             models.MessageType
                 .update(request.payload, {where: { id: messageTypeId } }) 
                 .then((messageType) => messageType ?  reply(messageType) : reply(Boom.notFound))
-                .catch(error => log.error(error))
+                .catch (error => {
+                    server.log(['error', 'app'], `Error updating message type: ${error}`)
+                    reply(Boom.badImplementation)
+                })
         },
         config: {
             description: 'Updates an existing message type',

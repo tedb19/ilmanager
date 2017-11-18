@@ -1,11 +1,13 @@
 
-import entityRoutes from './entity.routes'
-import messageTypeRoutes from './messagetype.routes'
-import subscriberRoutes from './subscriber.routes'
-import statsRoutes from './stats.routes'
-import logsRoutes from './logs.routes'
-import addressMappingRoutes from './addressmapping.routes'
-import webRoutes from './web.routes'
+import entityRoutes from './IL/entity.routes'
+import messageTypeRoutes from './IL/messagetype.routes'
+import subscriberRoutes from './IL/subscriber.routes'
+import statsRoutes from './IL/stats.routes'
+import logsRoutes from './IL/logs.routes'
+import addressMappingRoutes from './IL/addressmapping.routes'
+import webRoutes from './web-ui/web.routes'
+import labOrderRoutes from './VL/laborder.routes'
+import labResultRoutes from './VL/labresult.routes'
 
 export const routesPlugins = [
     { register: entityRoutes },
@@ -14,5 +16,7 @@ export const routesPlugins = [
     { register: subscriberRoutes },
     { register: statsRoutes },
     { register: logsRoutes },
-    { register: addressMappingRoutes }
+    { register: addressMappingRoutes },
+    { register: labOrderRoutes },
+    { register: labResultRoutes }
 ]

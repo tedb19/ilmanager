@@ -1,18 +1,25 @@
 import Boom from 'boom'
 
-import models from '../models'
-import { log } from '../utils/log.utils'
-import { getSubscribedMessageTypes } from '../logic/db.manipulation'
-import { getEntitiesStatus } from '../logic/stats.logic'
+import models from '../../models'
+import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
+import { getEntitiesStatus } from '../../logic/stats.logic'
 
 exports.register = (server, options, next) => {
-    server.route({
+
+    const ILServer = server.select('IL')
+
+    ILServer.route({
         path: '/api/stats/',
         method: 'GET',
         handler: async (request, reply) => {
-            const data = await getEntitiesStatus()
-            let stats = { data }
-            reply(stats)
+            try{
+                const data = await getEntitiesStatus()
+                let stats = { data }
+                reply(stats)
+            } catch (error) {
+                server.log(['error', 'app'], `Error fetching stats: ${error}`)
+                reply(Boom.badImplementation)
+            }            
         },
         config: {
             description: 'Get the stats for the dashboard',
@@ -25,7 +32,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/stats/',
         method: 'POST',
         handler: async (request, reply) => {
@@ -33,9 +40,9 @@ exports.register = (server, options, next) => {
             try{
                 const stat = await models.Stats.create(newStat)
                 stat ?  reply(stat) : reply(Boom.notFound)
-            } catch(err) {
-                console.log(err)
-                reply(Boom.notFound)
+            } catch (error) {
+                server.log(['error', 'app'], `Error creating stats: ${error}`)
+                reply(Boom.badImplementation)
             }
         },
         config: {

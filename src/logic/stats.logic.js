@@ -1,5 +1,4 @@
 import models from '../models'
-import { log } from '../utils/log.utils'
 import ping from 'ping'
 import { CronJob } from 'cron'
 

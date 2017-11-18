@@ -1,6 +1,6 @@
 const Code = require('code')
 const Lab = require('lab')
-const server = require('../../index')
+const server = require('../../src/lib/index')
 
 const lab = exports.lab = Lab.script();
 
@@ -9,24 +9,14 @@ const it = lab.it
 const before = lab.before
 const expect = Code.expect
 
-before((done) => {
-    /*
-        Callcack only fires once the server is initialized
-    */
-    server.labbableReady((err) => {
-        if(err) return done(err)
-        return done()
-    })
-})
-
-describe('GET /', () => {
+describe('GET /api/entities', () => {
     const request = {
         method: 'GET',
-        url: '/'
+        url: '/api/entities'
     }
     it('returns HTTP Status Code 200', (done) => {
       
-        server.inject(request, (response) => {
+        server.select('IL').inject(request, (response) => {
           expect(response.payload).equal(200)
           done()
         })
@@ -34,7 +24,8 @@ describe('GET /', () => {
 
     it('returns an array', (done) => {
       
-        server.inject(request, (response) => {
+        server.select('IL').inject(request, (response) => {
+            console.log(response.payload)
           expect(JSON.parse(response.payload)).to.be.an.array()
           done()
         })

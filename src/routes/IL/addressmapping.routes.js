@@ -1,17 +1,24 @@
 import Boom from 'boom'
 
-import models from '../models'
-import { getSubscribedMessageTypes } from '../logic/db.manipulation'
-import { createHash } from '../utils/hashing.utils'
-import { getActiveEntities } from '../logic/stats.logic'
+import models from '../../models'
+import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
+import { getActiveEntities } from '../../logic/stats.logic'
 
 exports.register = (server, options, next) => {
-    server.route({
+
+    const ILServer = server.select('IL')
+
+    ILServer.route({
         path: '/api/addresses',
         method: 'GET',
-        handler: async (request, reply) => {            
-            const addresses = await models.AddressMapping.findAll()
-            reply(addresses)
+        handler: async (request, reply) => {
+            try{
+                const addresses = await models.AddressMapping.findAll()
+                reply(addresses)
+            } catch (error) {
+                server.log(['error', 'app'], `Error fetching addresses: ${error}`)
+                reply(Boom.badImplementation)
+            }
         },
         config: {
             cache: {
@@ -28,13 +35,19 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/activeSystems',
         method: 'GET',
         handler: async (request, reply) => {
-            const addresses = await getActiveEntities()
-            const addressNames = addresses.map(address => address.name)
-            reply(addressNames)
+            try{
+                const addresses = await getActiveEntities()
+                const addressNames = addresses.map(address => address.name)
+                reply(addressNames)
+            } catch(error) {
+                server.log(['app','error'], `Error fetching the active systems: ${error}`)
+                reply(Boom.badImplementation)
+            }
+            
         },
         config: {
             cache: {
@@ -51,12 +64,17 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/addresses/{id}',
         method: 'GET',
         handler: async (request, reply) => {
-            const address = await models.AddressMapping.findAll({ where: { EntityId: request.params.id }})
-            address ?  reply(address) : reply({})
+            try{
+                const address = await models.AddressMapping.findAll({ where: { EntityId: request.params.id }})
+                address ?  reply(address) : reply({})
+            } catch(error) {
+                server.log(['app', 'error'], `Error fetching address by id: ${error}`)
+                reply(Boom.badImplementation)
+            }
         },
         config: {
             description: 'Get the address with the specified id',
@@ -69,7 +87,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/addresses',
         method: 'POST',
         handler: async (request, reply) => {
@@ -77,8 +95,8 @@ exports.register = (server, options, next) => {
                 const addressMapping = await models.AddressMapping.create(request.payload)
                 addressMapping ?  reply(addressMapping) : reply(Boom.notFound)
             } catch(err) {
-                console.log(err)
-                reply(Boom.notFound)
+                server.log(['app', 'error'], `Error creating new address: ${error}`)
+                reply(Boom.badImplementation)
             }
         },
         config: {
@@ -92,16 +110,21 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/addresses/{id}',
         method: 'PUT',
         handler: async (request, reply) => {
-            const addressMappingId = request.params.id 
-            let postBody = request.payload
-            const address = postBody.address
-            address ? postBody.status = 'ACTIVE' : postBody.status = 'INACTIVE'
-            const addressMapping = await models.AddressMapping.update(postBody, {where: { id: addressMappingId } })
-            addressMapping ?  reply(addressMapping) : reply(Boom.notFound)
+            try{
+                const addressMappingId = request.params.id 
+                let postBody = request.payload
+                const address = postBody.address
+                address ? postBody.status = 'ACTIVE' : postBody.status = 'INACTIVE'
+                const addressMapping = await models.AddressMapping.update(postBody, {where: { id: addressMappingId } })
+                addressMapping ?  reply(addressMapping) : reply(Boom.notFound)
+            } catch(err) {
+                server.log(['app', 'error'], `Error updating address: ${error}`)
+                reply(Boom.badImplementation)
+            }
         },
         config: {
             description: 'Updates an existing address mapping',
@@ -114,14 +137,19 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/addresses/{entityId}',
         method: 'DELETE',
         handler: async (request, reply) => {
             const EntityId = request.params.entityId
-            const addressMapping = await models.AddressMapping.destroy({
-                where: { EntityId }})
-            reply(addressMapping)
+            try{
+                const addressMapping = await models.AddressMapping.destroy({ where: { EntityId } })
+                reply(addressMapping)
+            } catch(err) {
+                server.log(['app', 'error'], `Error deleting address: ${error}`)
+                reply(Boom.badImplementation)
+            }
+            
         },
         config: {
             description: 'Deletes an existing address mapping',

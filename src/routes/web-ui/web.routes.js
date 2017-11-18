@@ -1,16 +1,18 @@
 import Boom from 'boom'
 import Path from 'path'
-import models from '../models'
-import { log } from '../utils/log.utils'
-import { getSubscribedEntities, getMessageTypeObj, getSubscribedMessageTypes } from '../logic/db.manipulation'
+import models from '../../models'
+import { getSubscribedEntities, getMessageTypeObj, getSubscribedMessageTypes } from '../../logic/db.manipulation'
 
 exports.register = (server, options, next) => {
-    server.route({
+
+    const ILServer = server.select('web-ui')
+
+    ILServer.route({
         method: 'GET',
         path: '/{path*}',
         handler: {
             directory: {
-                path: Path.join(__dirname, '..', 'build'),
+                path: Path.join(__dirname, '..', '..', 'build'),
                 index: true,
                 listing: false,
                 redirectToSlash: true

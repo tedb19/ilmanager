@@ -1,26 +1,30 @@
 import Boom from 'boom'
 
-import models from '../models'
-import { log } from '../utils/log.utils'
-import { getSubscribedMessageTypes } from '../logic/db.manipulation'
-import { createHash } from '../utils/hashing.utils'
+import models from '../../models'
+import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
 
 exports.register = (server, options, next) => {
-    server.route({
+    
+    const ILServer = server.select('IL')
+
+    ILServer.route({
         path: '/api/entities',
         method: 'GET',
         handler: async (request, reply) => {
-            let entities = []
             try{
-                entities = await models.Entity.findAll({
+                const entities = await models.Entity.findAll({
                     include: [{
                         model: models.AddressMapping,
                         attributes: ['protocol', 'address', 'status', 'updatedAt']
                     }]
                 })
-            }catch(error){console.log}      
+                reply(entities).code(200)
+            }catch (error) {
+                server.log(['error', 'app'], `Error fetching entities: ${error}`)
+                reply(Boom.badImplementation)
+            }   
             
-            reply(entities)
+            
         },
         config: {
             cache: {
@@ -37,12 +41,17 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/entities/{id}',
         method: 'GET',
         handler: async (request, reply) => {
-            const entity = await models.Entity.findById(request.params.id)
-            entity ?  reply(entity) : reply(Boom.notFound)
+            try{
+                const entity = await models.Entity.findById(request.params.id)
+                entity ?  reply(entity) : reply(Boom.notFound)
+            } catch (error) {
+                server.log(['error', 'app'], `Error fetching entity by id: ${error}`)
+                reply(Boom.badImplementation)
+            }
         },
         config: {
             description: 'Get the entity with the specified id',
@@ -55,13 +64,19 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/entities/subscriptions/{entityName}',
         method: 'GET',
         handler: async (request, reply) => {
-            const [ entity ] = await models.Entity.findAll({ where: { name: request.params.entityName }})
-            const messageTypes = await getSubscribedMessageTypes(entity)
-            reply(messageTypes)
+            try{
+                const [ entity ] = await models.Entity.findAll({ where: { name: request.params.entityName }})
+                const messageTypes = await getSubscribedMessageTypes(entity)
+                reply(messageTypes)
+            } catch (error) {
+                server.log(['error', 'app'], `Error fetching entity's subsriptions: ${error}`)
+                reply(Boom.badImplementation)
+            }
+            
         },
         config: {
             description: 'Get the message types that the supplied entity subscribed to, including the status of the subscription',
@@ -74,7 +89,7 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/entities',
         method: 'POST',
         handler: async (request, reply) => {
@@ -82,9 +97,9 @@ exports.register = (server, options, next) => {
             try{
                 const entity = await models.Entity.create(newEntity)
                 entity ?  reply(entity) : reply(Boom.notFound)
-            } catch(err) {
-                console.log(err)
-                reply(Boom.notFound)
+            } catch (error) {
+                server.log(['error', 'app'], `Error fetching entity's subsriptions: ${error}`)
+                reply(Boom.badImplementation)
             }
         },
         config: {
@@ -98,14 +113,20 @@ exports.register = (server, options, next) => {
         }
     })
 
-    server.route({
+    ILServer.route({
         path: '/api/entities/{id}',
         method: 'PUT',
         handler: async (request, reply) => {
-            const entityId = request.params.id 
-            let postBody = request.payload
-            const entity = await models.Entity.update(postBody, {where: { id: entityId } })
-            entity ?  reply(entity) : reply(Boom.notFound)
+            try{
+                const entityId = request.params.id 
+                let postBody = request.payload
+                const entity = await models.Entity.update(postBody, {where: { id: entityId } })
+                entity ?  reply(entity) : reply(Boom.notFound)
+            } catch (error) {
+                server.log(['error', 'app'], `Error updating entity: ${error}`)
+                reply(Boom.badImplementation)
+            }
+            
         },
         config: {
             description: 'Updates an existing entity',
