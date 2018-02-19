@@ -2,8 +2,10 @@ import good from 'good'
 
 export const goodPluginObj = {
     register: good,
-    opsInterval: 30*60*1000,
     options: {
+        ops: {
+            interval: 1000 * 60 * 10 //10 minutes
+        },
         reporters: {
             console: [{
                     module: 'good-squeeze',
@@ -20,7 +22,7 @@ export const goodPluginObj = {
             file:  [{
                 module: 'good-squeeze',
                 name: 'Squeeze',
-                args: [{ log: '*', response: '*', request: '*', error: '*' }]
+                args: [{ log: '*', ops: '*', response: '*', request: '*', error: '*' }]
             }, {
                 module: 'good-squeeze',
                 name: 'SafeJson',
@@ -34,7 +36,8 @@ export const goodPluginObj = {
                     'ops_log.json',
                     {
                         size: '300K',
-                        path: './logs'
+                        path: '../../logs',
+                        maxFiles: 10
                     }
                 ]
             }]

@@ -12,10 +12,9 @@ exports.register = (server, options, next) => {
         path: '/{path*}',
         handler: {
             directory: {
-                path: Path.join(__dirname, '..', '..', 'build'),
-                index: true,
+                path: Path.join(__dirname, '..', '..', '..', 'build'),
                 listing: false,
-                redirectToSlash: true
+                index: ['index.html']
             }
         },
         config: {
@@ -27,7 +26,6 @@ exports.register = (server, options, next) => {
             }
         }
     })
-  
   return next()
 }
 

@@ -11,6 +11,7 @@ export const stats = [
     {id: 5, name: 'APPOINTMENT_SCHEDULING_MESSAGETYPE', value: '0', description: ''},
     {id: 6, name: 'LAB_ORDER_MESSAGETYPE', value: '0', description: ''},
     {id: 7, name: 'VIRAL_LOAD_RESULT_MESSAGETYPE', value: '0', description: ''},
+    {id: 26, name: 'OBSERVATION_RESULT_UNSOLICITED_MESSAGETYPE', value: '0', description: ''},
 
     /** Message Status */
     {id: 8, name: 'SENT', value: '0', description: ''},

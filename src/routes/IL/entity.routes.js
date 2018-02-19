@@ -18,13 +18,11 @@ exports.register = (server, options, next) => {
                         attributes: ['protocol', 'address', 'status', 'updatedAt']
                     }]
                 })
-                reply(entities).code(200)
+                reply(entities)
             }catch (error) {
                 server.log(['error', 'app'], `Error fetching entities: ${error}`)
                 reply(Boom.badImplementation)
-            }   
-            
-            
+            }  
         },
         config: {
             cache: {

@@ -14,19 +14,21 @@ describe('GET /api/entities', () => {
         method: 'GET',
         url: '/api/entities'
     }
+    
     it('returns HTTP Status Code 200', (done) => {
       
         server.select('IL').inject(request, (response) => {
-          expect(response.payload).equal(200)
-          done()
+            expect(response.statusCode).to.equal(200)
+            done()
         })
     })
 
     it('returns an array', (done) => {
       
         server.select('IL').inject(request, (response) => {
-            console.log(response.payload)
-          expect(JSON.parse(response.payload)).to.be.an.array()
+            console.log('response.payload', response.payload)
+            console.log('response.result', response.result)
+          expect(response.payload).to.be.an.array()
           done()
         })
     })

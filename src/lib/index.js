@@ -19,7 +19,7 @@ server.register(plugins, (error) => {
     
     server.initialize((error) => {
         if (error) throw error
-        initializeDb(false)
+        initializeDb()
             .then((message) => {
                 server.log(['app', message.level], message.msg)
                 server.start((error) => {
@@ -30,10 +30,14 @@ server.register(plugins, (error) => {
                     server.log(['app', 'info'], `Viral Load API Server started @ ${server.select('VL').info.uri}`)
                     server.log(['app', 'info'], `Interoperability Layer API Server started @ ${server.select('IL').info.uri}`)
                     server.log(['app', 'info'], `Interoperability Layer Web Interface running @ ${server.select('web-ui').info.uri}`)
-                    checkSystemsStatus.start()
+                    checkSystemsStatus()
                 })
             })
-            .catch(error => server.log(['app', 'error'], error))
+            .catch(error => {
+                server.log(['app', 'error'], error)
+            })
     })
 })
+
+
 

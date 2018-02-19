@@ -52,7 +52,7 @@ exports.register = (server, options, next) => {
                 limit: limit,
                 offset: offset,
                 where: { level: request.params.level },
-                order: [ ['createdAt', 'DESC']],
+                order: [ ['id', 'DESC']],
                 $sort: { id: 1 }
             }).then((data) => {
                 let pages = Math.ceil(data.count / limit);
@@ -88,7 +88,7 @@ exports.register = (server, options, next) => {
                 limit: limit,
                 offset: offset,
                 where: { log: { $like: '%'+ request.params.searchTerm +'%' } },
-                order: [ ['createdAt', 'DESC']],
+                order: [ ['id', 'DESC']],
                 $sort: { id: 1 }
             }).then((data) => {
                 let pages = Math.ceil(data.count / limit);

@@ -13,6 +13,7 @@ module.exports = function(sequelize, DataTypes) {
       unique: true
     },
     description: DataTypes.TEXT,
+    template: DataTypes.TEXT,
     status: {
         type:   DataTypes.ENUM,
         values: ['ACTIVE', 'INACTIVE'],

@@ -33,10 +33,9 @@ exports.register = (server, options, next) => {
         path: '/labresults/sms',
         method: 'POST',
         handler: async (request, reply) => {
-            server.log(['app', 'lab', 'info'], `Incoming encoded sms: ${request.payload}`)
-            const message = JSON.parse(JSON.stringify(request.payload)).message
-            if(message.startsWith('IL')){
-                try {
+            try{
+                const message = JSON.parse(JSON.stringify(request.payload)).message
+                if(message.startsWith('IL')){
                     const encodedVL = message.slice(3)
                     const decodedVL = Buffer.from(encodedVL, 'base64').toString('utf-8')
                     server.log(['app', 'lab', 'info'], `Decoded sms: ${decodedVL}`)
@@ -56,12 +55,12 @@ exports.register = (server, options, next) => {
                     labResult.lab = payload[11].split(':')[1]
                     const savedLabResult = await models.LabResult.create(labResult)
                     reply({msg: 'results saved successfully!'})
-                } catch(error) {
-                    server.log(['app', 'lab', 'error'], error)
-                    reply(Boom.badImplementation)
+                } else {
+                    reply({msg: 'Not a valid VL result!'})
                 }
-            } else {
-                reply({msg: 'Not a valid VL result!'})
+            }catch(error) {
+                server.log(['app', 'lab', 'error'], error)
+                reply(Boom.badImplementation)
             }
         },
         config: {

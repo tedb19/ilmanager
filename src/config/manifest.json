@@ -23,7 +23,9 @@
       "plugin": {
         "register": "good",
         "options": {
-          "opsInterval": 5000,
+          "ops": {
+            "interval": "600000"
+        },
           "reporters": {
             "console": [
               {

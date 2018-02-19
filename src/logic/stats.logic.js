@@ -1,6 +1,7 @@
 import models from '../models'
 import ping from 'ping'
-import { CronJob } from 'cron'
+import { setInterval } from 'timers';
+import { error } from 'util';
 
 export const getActiveEntities = async () => {
     let addresses = []
@@ -12,36 +13,40 @@ export const getActiveEntities = async () => {
             addresses.push({name: entity.name, address: addressMapping[0].dataValues.address})
         }
     } catch(error) {
-        server.log(['app', 'error'], error)
+        console.log('active entities', error)
     }
     return addresses
 }
 
+export const isLocalAddress = async (client) => client.address.match(/localhost|127.0.0.1/g) ? true : false
+
 export const updateEntitiesStatus = async () => {
     const clients = await getActiveEntities()
-    clients.forEach(client => {
-        
-       ping.sys.probe(client.address.split(':')[0], (isAlive) => {
-           const status = isAlive ? 'online' : 'offline'
-
-           models.Stats.update({ value: status }, {
-                where: { 
-                    name: `${client.name}_STATUS`
-                }
-          }).then(response => response)
-          .catch(error => server.log(['app', 'error'], error))
-       })
-    })
+    for(let client of clients){
+        let status = await isLocalAddress(client) ? 'online' : 'offline'
+        if(status === 'offline'){
+            ping.sys.probe(client.address.split(':')[0], (isAlive) => {
+                status = isAlive ? 'online' : 'offline'
+            })
+        }
+        models.Stats.update({ value: status }, {
+            where: {
+                name: `${client.name}_STATUS`
+            }
+        }).then(response => response)
+        .catch(error => server.log(['app', 'error'], error))
+    }
 }
 
-export const checkSystemsStatus = new CronJob({
-    cronTime: '* * * * *',
-    onTick: async () => {
-        await updateEntitiesStatus()
-    },
-    start: false,
-    timeZone: 'Africa/Nairobi'
-})
+export const checkSystemsStatus = () => {
+    setInterval(async () => {
+        try{
+            await updateEntitiesStatus()
+        } catch(error){
+            console.log(error)
+        }
+    }, 1000*60*5)
+}
 
 export const getEntitiesStatus = async () => {
     const clients = await getActiveEntities()

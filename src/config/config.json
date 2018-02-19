@@ -1,19 +1,26 @@
 {
   "development": {
     "username": "root",
-    "password": "maun2806;",
+    "password": "maun",
     "database": "interopdb_dev",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "test": {
     "dialect": "sqlite",
-    "storage": ":memory:"
+    "storage": ":memory:",
+    "pool": {
+      "max": "5",
+      "min": "0",
+      "acquire": "30000",
+      "idle": "10000"
+    }
   },
   "production": {
-    "username": "root",
-    "password": "maun2806;",
-    "database": "interopdb_prod",
+    "username": "sa",
+    "password": "maun",
+    "database": "interopdb_dev",
     "host": "localhost",
     "dialect": "mysql"
   }
