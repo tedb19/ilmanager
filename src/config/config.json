@@ -23,5 +23,16 @@
     "database": "interopdb_dev",
     "host": "localhost",
     "dialect": "mysql"
+  },
+  "iqcare": {
+    "username": "sa",
+    "password": "c0nstella",
+    "database": "interopdb_dev",
+    "host": "localhost",
+    "dialect": "mssql",
+    "logging": false,
+    "options": {
+      "instanceName": "SQLEXPRESS"
+    }
   }
 }

@@ -8,6 +8,7 @@ import addressMappingRoutes from './IL/addressmapping.routes'
 import webRoutes from './web-ui/web.routes'
 import labOrderRoutes from './VL/laborder.routes'
 import labResultRoutes from './VL/labresult.routes'
+import DADRoutes from './DAD/dad.routes'
 
 export const routesPlugins = [
     { register: entityRoutes },
@@ -18,5 +19,6 @@ export const routesPlugins = [
     { register: logsRoutes },
     { register: addressMappingRoutes },
     { register: labOrderRoutes },
-    { register: labResultRoutes }
+    { register: labResultRoutes },
+    { register: DADRoutes }
 ]

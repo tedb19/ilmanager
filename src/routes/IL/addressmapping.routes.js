@@ -92,7 +92,11 @@ exports.register = (server, options, next) => {
         method: 'POST',
         handler: async (request, reply) => {
             try{
-                const addressMapping = await models.AddressMapping.create(request.payload)
+                const data = request.payload.protocol === 'HTTP' && !request.payload.address.includes('http') 
+                    ? {...request.payload, address: `http://${request.payload.address}`} 
+                    : request.payload
+                console.log('data', data)
+                const addressMapping = await models.AddressMapping.create(data)
                 addressMapping ?  reply(addressMapping) : reply(Boom.notFound)
             } catch(err) {
                 server.log(['app', 'error'], `Error creating new address: ${error}`)

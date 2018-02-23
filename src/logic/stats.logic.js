@@ -8,7 +8,11 @@ export const getActiveEntities = async () => {
     try{
         let entities = await models.Entity.findAll()
         for(let entity of entities){
-            const addressMapping = await entity.getAddressMappings()
+            const addressMapping = await models.AddressMapping.findAll({
+                where: {
+                    EntityId: entity.id
+                }
+            })
             if(!addressMapping.length) continue
             addresses.push({name: entity.name, address: addressMapping[0].dataValues.address})
         }
@@ -38,6 +42,15 @@ export const updateEntitiesStatus = async () => {
     }
 }
 
+export const updateNumericStats = async (statsChanges) => {
+    for(let statsChange of statsChanges) {
+        const {name, increment} = statsChange
+        increment
+            ? await models.Stats.update({ value: models.sequelize.literal('value + 1') }, { where: { name } })
+            : await models.Stats.update({ value: models.sequelize.literal('value - 1') }, { where: { name } })
+    }   
+}
+
 export const checkSystemsStatus = () => {
     setInterval(async () => {
         try{
@@ -49,7 +62,6 @@ export const checkSystemsStatus = () => {
 }
 
 export const getEntitiesStatus = async () => {
-    const clients = await getActiveEntities()
     const stats = await models.Stats.findAll({
         attributes: ['name','value', 'updatedAt']
     })
