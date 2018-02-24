@@ -8,8 +8,9 @@ import { updateEntitiesStatus } from '../logic/stats.logic'
 import { checkSystemsStatus } from '../logic/stats.logic'
 import { queueManager } from '../logic/queue.logic';
 import { processIncoming } from '../routes/DAD/processMessage'
+import { VLManager } from '../routes/VL/labresult.payload'
 
-const server = module.exports = new Hapi.Server();
+const server = module.exports = new Hapi.Server()
 
 server.connection({ port: 3003, labels: ['IL'] })
 server.connection({ port: 5000, labels: ['web-ui'] })
@@ -61,6 +62,7 @@ server.register(plugins, (error) => {
                     server.log(['app', 'info'], `Data Acquisition and Dispersal System (DAD) running @ ${server.select('DAD').info.uri}`)
                     checkSystemsStatus()
                     queueManager()
+                    VLManager()
                 })
             })
             .catch(error => {

@@ -4,8 +4,7 @@
     "password": "maun",
     "database": "interopdb_dev",
     "host": "localhost",
-    "dialect": "mysql",
-    "logging": false
+    "dialect": "mysql"
   },
   "test": {
     "dialect": "sqlite",

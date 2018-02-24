@@ -36,7 +36,7 @@ export const processIncoming = async (payload) => {
         await models.Queue.create({
             message: JSON.stringify(payload),
             sendDetails: receivedMsgLog,
-            noOfAttempts: 1,
+            noOfAttempts: 0,
             EntityId: msgRecepient.id
         })
     }       

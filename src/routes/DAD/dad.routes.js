@@ -21,12 +21,12 @@ exports.register = (server, options, next) => {
         handler: async (request, reply) => {
             let { payload } = request
             try{
-                const CCCNumber = processIncoming(payload)
+                const CCCNumber = await processIncoming(payload)
                 let response = ''
                 CCCNumber
                     ? response = JSON.stringify({ msg: 'successfully received by the Interoperability Layer (IL)'})
                     : response = Boom.notAcceptable('No CCC Number specified! This message will still be sent out')
-                reply(response)                     
+                reply(response)         
             } catch(error) {
                 server.log(['error', 'app'], `Error : ${error}`)
                 reply(Boom.badImplementation)
