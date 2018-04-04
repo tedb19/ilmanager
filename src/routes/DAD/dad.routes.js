@@ -10,6 +10,7 @@ import { getMessageTypeName, getSendingApplication, getRandomIdentifier, getMsgR
 import { messageDispatcher } from './messagedispatcher'
 import { updateNumericStats } from '../../logic/stats.logic'
 import { processIncoming } from './processMessage';
+import { logger } from '../../utils/logger.utils'
 
 exports.register = (server, options, next) => {
     
@@ -28,7 +29,7 @@ exports.register = (server, options, next) => {
                     : response = Boom.notAcceptable('No CCC Number specified! This message will still be sent out')
                 reply(response)         
             } catch(error) {
-                server.log(['error', 'app'], `Error : ${error}`)
+                logger.error(`Error : ${error}`)
                 reply(Boom.badImplementation)
             }
         },

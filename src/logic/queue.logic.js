@@ -2,17 +2,28 @@ import models from '../models'
 import { getSubscribedMessageTypes, getMessageTypeObj, getSubscribedEntities } from './db.manipulation'
 import { getMessageTypeName, getSendingApplication, getRandomIdentifier, getMsgRecepients, getCCCNumber } from '../routes/DAD/message.manipulation'
 import { messageDispatcher } from '../routes/DAD/messagedispatcher'
-import { updateNumericStats } from './stats.logic'
+import { updateNumericStats, updateMsgStats } from './stats.logic'
+import { logger } from '../utils/logger.utils';
 
 export const queueManager = () => {
     setInterval(async () => {
         try{
             await processAllQueued()
-            await pruneQueue()
+            //await pruneQueue()
         } catch(error){
-            console.log(error)
+            logger.error(error)
         }
     }, 2000)
+}
+
+export const QueuePruner = () => {
+    setInterval(async () => {
+        try{
+            await pruneQueue()
+        } catch(error){
+            logger.error(error)
+        }
+    }, 60000*60*24)
 }
 
 const pruneQueue = async () => {
@@ -28,6 +39,8 @@ export const processAllQueued = async () => {
     for(let queuedMessage of queuedMessages) {
         await processQueued(queuedMessage)
     }
+    await updateMsgStats('QUEUED')
+    await updateMsgStats('SENT')
 }
 
 export const processQueued = async (queue) => {
@@ -42,82 +55,74 @@ export const processQueued = async (queue) => {
     const CCCNumber = getCCCNumber(payload)
     let forwardingMsgLog = ''
 
+    let identifier = {}
     if(CCCNumber) {
-        forwardingMsgLog = 
-            `Sending ${messageType.verboseName.replace(/_/g, ' ')} message 
-            (${CCCNumber.IDENTIFIER_TYPE} : ${CCCNumber.ID}) from ${sendingApplication} to ${entity.name}. 
-            Total send attempts are now ${queue.noOfAttempts}`
+        identifier.IDENTIFIER_TYPE = CCCNumber.IDENTIFIER_TYPE
+        identifier.ID = CCCNumber.ID
     } else {
         const randomIdentifier = getRandomIdentifier(payload)
-        forwardingMsgLog = 
-            `Sending ${messageType.verboseName.replace(/_/g, ' ')} message 
-            (${randomIdentifier.IDENTIFIER_TYPE} : ${randomIdentifier.ID}) from ${sendingApplication} to ${entity.name}. 
-            Total send attempts are now ${queue.noOfAttempts}`
+        identifier.IDENTIFIER_TYPE = randomIdentifier.IDENTIFIER_TYPE
+        identifier.ID = randomIdentifier.ID
     }
-    if(!queue.noOfAttempts || queue.noOfAttempts % 100 === 0) {
-        await models.Logs.create({level: 'INFO', log: forwardingMsgLog})
-    }
+
+    forwardingMsgLog = 
+            `Sending ${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) from ${sendingApplication} to ${entity.name}. `
     
-    try{
-        if(addressMapping.protocol === 'TCP') {
-            const client = await messageDispatcher.sendTCP(addressMapping.address, JSON.stringify(payload))
+    if(queue.noOfAttempts > 0) forwardingMsgLog = forwardingMsgLog +`Total send attempts are now ${queue.noOfAttempts}`
+    
 
-            client.on('data', async (data) => {
-                let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${CCCNumber.IDENTIFIER_TYPE} : ${CCCNumber.ID}) sent to ${entity.name} successfully!`
-                const statsChanges = [
-                    {name: 'SENT', increment: true},
-                    {name: 'QUEUED', increment: false}
-                ]
-                await Promise.all([
-                    models.Logs.create({level: 'INFO', log: sentLog}),
-                    queue.update({ status: 'SENT', sendDetails: sentLog }),
-                    updateNumericStats(statsChanges)
-                ])
+    if(addressMapping.protocol === 'TCP') {
+        const client = await messageDispatcher.sendTCP(addressMapping.address, JSON.stringify(payload))
+
+        client.on('data', async (data) => {
+            let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) sent to ${entity.name} successfully! Total send attempts: ${queue.noOfAttempts+1}.`
+            const statsChanges = [
+                {name: 'SENT', increment: true},
+                {name: 'QUEUED', increment: false}
+            ]
+            await Promise.all([
+                models.Logs.create({level: 'INFO', log: sentLog, QueueId: queue.id}),
+                queue.update({ status: 'SENT', sendDetails: sentLog, noOfAttempts: `${queue.noOfAttempts+1}`}),
+                updateNumericStats(statsChanges)
+            ])
+        })
+
+        client.on('error', async (error) => {
+            let queueLog = `An attempt was made to send ${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${addressMapping.address}), but there was an error encountered => ${error}. This message has been queued`
+            if(queue.noOfAttempts === 0) {
+                await models.Logs.create({level: 'WARNING', log: queueLog, QueueId: queue.id})
+            }
+            await queue.update({
+                sendDetails: queueLog,
+                noOfAttempts: `${queue.noOfAttempts+1}`
             })
-
-            client.on('error', async (error) => {
-                let queueLog = `An attempt was made to send a ${messageType.verboseName.replace(/_/g, ' ')} message (${CCCNumber.IDENTIFIER_TYPE} : ${CCCNumber.ID}) to ${entity.name} (Address: ${addressMapping.address}), but there was an error encountered => ${error}. This message has been queued`
-                if(!queue.noOfAttempts || queue.noOfAttempts % 100 === 0) {
-                    await models.Logs.create({level: 'WARNING', log: queueLog})
-                }
-                await queue.update({
-                    sendDetails: queueLog,
-                    noOfAttempts: `${queue.noOfAttempts+1}`
-                })
-            })            
-        } else {
+        })     
+    } else {
+        try{
             const response = await messageDispatcher.sendHTTP(addressMapping.address, JSON.stringify(payload))
             if(response.ok) {
-                let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${CCCNumber.IDENTIFIER_TYPE} : ${CCCNumber.ID}) sent to ${entity.name} successfully!`
+                let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) sent to ${entity.name} successfully! Total send attempts: ${queue.noOfAttempts+1}.`
                 const statsChanges = [
                     {name: 'SENT', increment: true},
                     {name: 'QUEUED', increment: false}
                 ]
                 await Promise.all([
-                    models.Logs.create({level: 'INFO', log: sentLog}),
-                    queue.update({ status: 'SENT', sendDetails: sentLog }),
+                    models.Logs.create({level: 'INFO', log: sentLog, QueueId: queue.id}),
+                    queue.update({ status: 'SENT', sendDetails: sentLog, noOfAttempts: `${queue.noOfAttempts+1}` }),
                     updateNumericStats(statsChanges)
                 ])
             } else {
-                let queueLog = `An attempt was made to send a ${messageType.verboseName.replace(/_/g, ' ')} message (${CCCNumber.IDENTIFIER_TYPE} : ${CCCNumber.ID}) to ${entity.name} (Address: ${addressMapping.address}), but the system was offline. IL will keep trying to reach this system. If this persists, please check your network`
-                if(!queue.noOfAttempts || queue.noOfAttempts % 100 === 0) {
-                    await models.Logs.create({level: 'WARNING', log: queueLog})
-                }
-                await queue.update({
-                    sendDetails: queueLog,
-                    noOfAttempts: `${queue.noOfAttempts+1}`
-                })
+                throw response
             }
-        }                  
-    } catch(error) {
-        //save to queue
-        let queueLog = `An attempt was made to send a ${messageType.verboseName.replace(/_/g, ' ')} message (${CCCNumber.IDENTIFIER_TYPE} : ${CCCNumber.ID}) to ${entity.name} (Address: ${addressMapping.address}), but there was an error encountered => ${error}. This message has been queued`
-        if(!queue.noOfAttempts || queue.noOfAttempts % 100 === 0) {
-            await models.Logs.create({level: 'WARNING', log: queueLog})
+        } catch(error) {
+            let queueLog = `An attempt was made to send ${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${addressMapping.address}), but there was an error encountered => ${error.message}. This message has been queued`
+            if(queue.noOfAttempts === 0) {
+                await models.Logs.create({ level: 'WARNING', log: queueLog, QueueId: queue.id })
+            }
+            await queue.update({
+                sendDetails: queueLog,
+                noOfAttempts: `${queue.noOfAttempts+1}`
+            })
         }
-        await queue.update({
-            sendDetails: queueLog,
-            noOfAttempts: `${queue.noOfAttempts+1}`
-        })
     }
 }

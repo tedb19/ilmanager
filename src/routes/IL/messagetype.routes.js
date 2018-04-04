@@ -14,7 +14,7 @@ exports.register = (server, options, next) => {
                 .findAll()
                 .then(messageType => reply(messageType))
                 .catch (error => {
-                    server.log(['error', 'app'], `Error fetching message types: ${error}`)
+                    logger.error(`Error fetching message types: ${error}`)
                     reply(Boom.badImplementation)
                 })
         },
@@ -37,7 +37,7 @@ exports.register = (server, options, next) => {
                 .findById(request.params.id)
                 .then((messageType) => messageType ?  reply(messageType) : reply(Boom.notFound))
                 .catch (error => {
-                    server.log(['error', 'app'], `Error fetching message type by id: ${error}`)
+                    logger.error(`Error fetching message type by id: ${error}`)
                     reply(Boom.badImplementation)
                 })
         },
@@ -60,7 +60,7 @@ exports.register = (server, options, next) => {
                 .create(request.payload)
                 .then((messagetype) => messagetype ?  reply(messagetype) : reply(Boom.notFound))
                 .catch (error => {
-                    server.log(['error', 'app'], `Error creating message type: ${error}`)
+                    logger.error(`Error creating message type: ${error}`)
                     reply(Boom.badImplementation)
                 })
         },
@@ -84,7 +84,7 @@ exports.register = (server, options, next) => {
                 .update(request.payload, {where: { id: messageTypeId } }) 
                 .then((messageType) => messageType ?  reply(messageType) : reply(Boom.notFound))
                 .catch (error => {
-                    server.log(['error', 'app'], `Error updating message type: ${error}`)
+                    logger.error(`Error updating message type: ${error}`)
                     reply(Boom.badImplementation)
                 })
         },

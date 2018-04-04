@@ -2,10 +2,23 @@ import Boom from 'boom'
 
 import models from '../../models'
 import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
+import { logger } from '../../utils/logger.utils'
+import socketIo from 'socket.io'
 
 exports.register = (server, options, next) => {
 
     const ILServer = server.select('IL')
+
+    const io = (socketIo)(ILServer.listener)
+
+    io.on('connection', (socket) => {
+
+        socket.emit('Oh hii!')
+
+        socket.on('burp', function () {
+            socket.emit('Excuse you!')
+        })
+    })
 
     ILServer.route({
         path: '/api/logs/{page}',
@@ -25,7 +38,7 @@ exports.register = (server, options, next) => {
                 const logs = data.rows
                 reply({'result': logs, 'count': data.count, 'pages': pages})
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching logs by page: ${error}`)
+                logger.error(`Error fetching logs by page: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -61,7 +74,7 @@ exports.register = (server, options, next) => {
                 reply({'result': logs, 'count': data.count, 'pages': pages})
             })
             .catch (error => {
-                server.log(['error', 'app'], `Error fetching logs by log level and page: ${error}`)
+                logger.error(`Error fetching logs by log level and page: ${error}`)
                 reply(Boom.badImplementation)
             })
         },
@@ -83,11 +96,11 @@ exports.register = (server, options, next) => {
             let page = request.params.page;      // page number
             let limit = 10;   // number of records per page
             let offset = page * limit;
-                
+
             models.Logs.findAndCountAll({
                 limit: limit,
                 offset: offset,
-                where: { log: { $like: '%'+ request.params.searchTerm +'%' } },
+                where: { log: { [models.Sequelize.Op.like]: '%'+ request.params.searchTerm +'%' } },
                 order: [ ['id', 'DESC']],
                 $sort: { id: 1 }
             }).then((data) => {
@@ -97,7 +110,7 @@ exports.register = (server, options, next) => {
                 reply({'result': logs, 'count': data.count, 'pages': pages})
             })
             .catch (error => {
-                server.log(['error', 'app'], `Error searching for logs by search term and page: ${error}`)
+                logger.error(`Error searching for logs by search term and page: ${error}`)
                 reply(Boom.badImplementation)
             })
         },
@@ -122,7 +135,7 @@ exports.register = (server, options, next) => {
                 })
                 .then(logs => reply(logs))
                 .catch (error => {
-                    server.log(['error', 'app'], `Error fetching log count: ${error}`)
+                    logger.error(`Error fetching log count: ${error}`)
                     reply(Boom.badImplementation)
                 })
         },

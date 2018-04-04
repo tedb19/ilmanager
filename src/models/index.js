@@ -6,7 +6,23 @@ import Sequelize from 'sequelize'
 
 const env    = process.env.NODE_ENV || "development"
 const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env]
-const sequelize = process.env.DATABASE_URL ? new Sequelize(process.env.DATABASE_URL) : new Sequelize(config.database, config.username, config.password, config)
+const prodConfig = {
+  username: process.env.USERNAME_PROP,
+  password: process.env.PASSWORD_PROP,
+  database: process.env.DATABASE_PROP,
+  host: "localhost",
+  dialect: "mssql",
+  logging: false,
+  operatorsAliases: false,
+  options: {
+    instanceName: process.env.SERVER_PROP
+  }
+}
+
+const sequelize = process.env.USERNAME_PROP 
+  ? new Sequelize(prodConfig.database, prodConfig.username, prodConfig.password, prodConfig) 
+  : new Sequelize(config.database, config.username, config.password, config)
+
 const db = {}
 
 fs

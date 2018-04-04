@@ -4,13 +4,13 @@
 /node_modules
 
 # logs
-/logs
+/logs*
 
 # testing
 /coverage
 
 # production
-/dist
+/dist*
 /build
 
 # misc

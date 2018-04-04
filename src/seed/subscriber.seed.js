@@ -39,8 +39,5 @@ const messageSubscribers = [
     { EntityId: 7, MessageTypeId: 2},
 
     /** DHIS2 */
-    { EntityId: 8, MessageTypeId: 8},
-
-    /** DATIM */
-    { EntityId: 9, MessageTypeId: 8}
+    { EntityId: 8, MessageTypeId: 8}
 ]

@@ -21,20 +21,5 @@ export const messageDispatcher = {
             client.end()
         })
         return client
-    },
-    receiveTCP: async (port) => {
-        const server = net.createServer((socket) => {
-            console.log('client connected')
-            socket.on('end', () => {
-              console.log('client disconnected')
-            })
-        })
-
-        server.on('error', (err) => {
-            throw err;
-        })
-        server.listen(port, () => {
-            console.log(`TCP Listener bound on port ${port}`)
-        })
     }
 }

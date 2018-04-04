@@ -2,6 +2,7 @@ import Boom from 'boom'
 import jsonxml from 'jsontoxml'
 
 import models from '../../models'
+import { logger } from '../../utils/logger.utils'
 
 
 exports.register = (server, options, next) => {
@@ -17,7 +18,7 @@ exports.register = (server, options, next) => {
                 const newLabs = labOrders.map((labOrder, idx) => ({idx: labOrder}))
                 reply(jsonxml(JSON.stringify(newLabs))).type('application/xml')
             } catch(error) {
-                server.log(['error', 'app', 'lab'], `Error fetching lab orders: ${error}`)
+                logger.error(`Error fetching lab orders: ${error}`)
                 reply(Boom.badImplementation)
             }
             
@@ -42,11 +43,11 @@ exports.register = (server, options, next) => {
         method: 'POST',
         handler: async (request, reply) => {
             try{
-                server.log(['info', 'app', 'lab'], request.payload)
+                logger.info(request.payload)
                 //update transferFlag to true
                 reply(true)
             } catch(error) {
-                server.log(['error', 'app', 'lab'], `Error fetching lab orders: ${error}`)
+                logger.error(`Error fetching lab orders: ${error}`)
                 reply(Boom.badImplementation)
             }
             

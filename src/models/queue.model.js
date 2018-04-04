@@ -22,6 +22,7 @@ module.exports = function(sequelize, DataTypes) {
 
   Queue.associate = function(models) {
     Queue.belongsTo(models.Entity)
+    Queue.hasMany(models.Logs)
   }
   
   return Queue

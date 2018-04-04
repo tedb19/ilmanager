@@ -4,11 +4,15 @@
     "password": "maun",
     "database": "interopdb_dev",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false,
+    "operatorsAliases": false
   },
   "test": {
     "dialect": "sqlite",
     "storage": ":memory:",
+    "logging": false,
+    "operatorsAliases": false,
     "pool": {
       "max": "5",
       "min": "0",
@@ -21,7 +25,9 @@
     "password": "maun",
     "database": "interopdb_dev",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false,
+    "operatorsAliases": false
   },
   "iqcare": {
     "username": "sa",
@@ -30,6 +36,7 @@
     "host": "localhost",
     "dialect": "mssql",
     "logging": false,
+    "operatorsAliases": false,
     "options": {
       "instanceName": "SQLEXPRESS"
     }

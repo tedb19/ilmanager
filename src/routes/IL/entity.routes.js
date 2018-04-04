@@ -20,7 +20,7 @@ exports.register = (server, options, next) => {
                 })
                 reply(entities)
             }catch (error) {
-                server.log(['error', 'app'], `Error fetching entities: ${error}`)
+                logger.error(`Error fetching entities: ${error}`)
                 reply(Boom.badImplementation)
             }  
         },
@@ -47,7 +47,7 @@ exports.register = (server, options, next) => {
                 const entity = await models.Entity.findById(request.params.id)
                 entity ?  reply(entity) : reply(Boom.notFound)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching entity by id: ${error}`)
+                logger.error(`Error fetching entity by id: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -71,7 +71,7 @@ exports.register = (server, options, next) => {
                 const messageTypes = await getSubscribedMessageTypes(entity)
                 reply(messageTypes)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching entity's subsriptions: ${error}`)
+                logger.error(`Error fetching entity's subsriptions: ${error}`)
                 reply(Boom.badImplementation)
             }
             
@@ -96,7 +96,7 @@ exports.register = (server, options, next) => {
                 const entity = await models.Entity.create(newEntity)
                 entity ?  reply(entity) : reply(Boom.notFound)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching entity's subsriptions: ${error}`)
+                logger.error(`Error fetching entity's subsriptions: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -121,7 +121,7 @@ exports.register = (server, options, next) => {
                 const entity = await models.Entity.update(postBody, {where: { id: entityId } })
                 entity ?  reply(entity) : reply(Boom.notFound)
             } catch (error) {
-                server.log(['error', 'app'], `Error updating entity: ${error}`)
+                logger.error(`Error updating entity: ${error}`)
                 reply(Boom.badImplementation)
             }
             

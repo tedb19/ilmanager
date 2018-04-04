@@ -2,6 +2,7 @@ import models from '../models'
 import ping from 'ping'
 import { setInterval } from 'timers';
 import { error } from 'util';
+import { logger } from '../utils/logger.utils';
 
 export const getActiveEntities = async () => {
     let addresses = []
@@ -17,7 +18,7 @@ export const getActiveEntities = async () => {
             addresses.push({name: entity.name, address: addressMapping[0].dataValues.address})
         }
     } catch(error) {
-        console.log('active entities', error)
+        logger.error(`Error while getting active entities: ${error}`)
     }
     return addresses
 }
@@ -38,9 +39,18 @@ export const updateEntitiesStatus = async () => {
                 name: `${client.name}_STATUS`
             }
         }).then(response => response)
-        .catch(error => server.log(['app', 'error'], error))
+        .catch(error => logger.error(`Error while updating the entity status: ${error}`))
     }
 }
+
+export const updateMsgStats = async (status) => {
+    const totalQueued = await totalCounts(status)
+    await models.Stats.update({ value: totalQueued.count }, { where: { name: status } })     
+}
+
+const totalCounts = async (status) => await models.Queue.findAndCountAll({
+    where: { status }
+})
 
 export const updateNumericStats = async (statsChanges) => {
     for(let statsChange of statsChanges) {
@@ -56,7 +66,7 @@ export const checkSystemsStatus = () => {
         try{
             await updateEntitiesStatus()
         } catch(error){
-            console.log(error)
+            logger.error(`Error while checking system status: ${error}`)
         }
     }, 1000*60*5)
 }

@@ -3,6 +3,7 @@ import Boom from 'boom'
 import models from '../../models'
 import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
 import { getEntitiesStatus } from '../../logic/stats.logic'
+import { logger } from '../../utils/logger.utils';
 
 exports.register = (server, options, next) => {
 
@@ -17,7 +18,7 @@ exports.register = (server, options, next) => {
                 let stats = { data }
                 reply(stats)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching stats: ${error}`)
+                logger.error(`Error fetching stats: ${error}`)
                 reply(Boom.badImplementation)
             }            
         },
@@ -41,7 +42,7 @@ exports.register = (server, options, next) => {
                 const stat = await models.Stats.create(newStat)
                 stat ?  reply(stat) : reply(Boom.notFound)
             } catch (error) {
-                server.log(['error', 'app'], `Error creating stats: ${error}`)
+                logger.error(`Error creating stats: ${error}`)
                 reply(Boom.badImplementation)
             }
         },

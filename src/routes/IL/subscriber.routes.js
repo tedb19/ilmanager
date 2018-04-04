@@ -2,6 +2,7 @@ import Boom from 'boom'
 
 import models from '../../models'
 import { getSubscribedEntities, getMessageTypeObj, getSubscribedMessageTypes } from '../../logic/db.manipulation'
+import { logger } from '../../utils/logger.utils';
 
 exports.register = (server, options, next) => {
 
@@ -21,7 +22,7 @@ exports.register = (server, options, next) => {
                 }
                 reply(messageSubscribers)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching subscribers: ${error}`)
+                logger.error(`Error fetching subscribers: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -50,7 +51,7 @@ exports.register = (server, options, next) => {
                 }
                 reply(messageSubscribers)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching entity subscriptions: ${error}`)
+                logger.error(`Error fetching entity subscriptions: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -74,7 +75,7 @@ exports.register = (server, options, next) => {
                 const entities = await getSubscribedEntities(messageType)
                 reply(entities)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching message type subscriptions: ${error}`)
+                logger.error(`Error fetching message type subscriptions: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -97,7 +98,7 @@ exports.register = (server, options, next) => {
                 .create(request.payload)
                 .then((messagetype) => messagetype ?  reply(messagetype) : reply(Boom.notFound))
                 .catch(error => {
-                    server.log(['error', 'app'], `Error creating subscription: ${error}`)
+                    logger.error(`Error creating subscription: ${error}`)
                     reply(Boom.badImplementation)
                 })
         },
@@ -121,7 +122,7 @@ exports.register = (server, options, next) => {
                 .update(request.payload, {where: { id: messageTypeId } }) 
                 .then((messageType) => messageType ?  reply(messageType) : reply(Boom.notFound))
                 .catch(error => {
-                    server.log(['error', 'app'], `Error updating subscription: ${error}`)
+                    logger.error(`Error updating subscription: ${error}`)
                     reply(Boom.badImplementation)
                 })
         },
@@ -148,7 +149,7 @@ exports.register = (server, options, next) => {
                })
                reply({ EntityId: entityId, MessageTypeId: messageTypeId })
             } catch(error) {
-                server.log(['error', 'app'], `Error deleting subscription: ${error}`)
+                logger.error(`Error deleting subscription: ${error}`)
                 reply(Boom.badImplementation)
             }            
         },

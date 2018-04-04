@@ -7,7 +7,7 @@ module.exports = function(sequelize, DataTypes) {
         values: ["TCP", "HTTP", "HTTPS"],
         defaultValue: 'HTTP'
     },
-    address: DataTypes.TEXT,
+    address: DataTypes.STRING(256),
     status: {
       type:   DataTypes.ENUM,
       values: ['ACTIVE', 'INACTIVE'],

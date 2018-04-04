@@ -9,6 +9,9 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: 'INFO'
     }
   })
-  
+
+  Logs.associate = function(models) {
+    Logs.belongsTo(models.Queue)
+  }
   return Logs
 }

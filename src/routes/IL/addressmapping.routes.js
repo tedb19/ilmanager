@@ -3,6 +3,7 @@ import Boom from 'boom'
 import models from '../../models'
 import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
 import { getActiveEntities } from '../../logic/stats.logic'
+import { logger } from '../../utils/logger.utils';
 
 exports.register = (server, options, next) => {
 
@@ -16,7 +17,7 @@ exports.register = (server, options, next) => {
                 const addresses = await models.AddressMapping.findAll()
                 reply(addresses)
             } catch (error) {
-                server.log(['error', 'app'], `Error fetching addresses: ${error}`)
+                logger.error(`Error fetching addresses: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -44,7 +45,7 @@ exports.register = (server, options, next) => {
                 const addressNames = addresses.map(address => address.name)
                 reply(addressNames)
             } catch(error) {
-                server.log(['app','error'], `Error fetching the active systems: ${error}`)
+                logger.error(`Error fetching the active systems: ${error}`)
                 reply(Boom.badImplementation)
             }
             
@@ -72,7 +73,7 @@ exports.register = (server, options, next) => {
                 const address = await models.AddressMapping.findAll({ where: { EntityId: request.params.id }})
                 address ?  reply(address) : reply({})
             } catch(error) {
-                server.log(['app', 'error'], `Error fetching address by id: ${error}`)
+                logger.error(`Error fetching address by id: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -95,11 +96,10 @@ exports.register = (server, options, next) => {
                 const data = request.payload.protocol === 'HTTP' && !request.payload.address.includes('http') 
                     ? {...request.payload, address: `http://${request.payload.address}`} 
                     : request.payload
-                console.log('data', data)
                 const addressMapping = await models.AddressMapping.create(data)
                 addressMapping ?  reply(addressMapping) : reply(Boom.notFound)
             } catch(err) {
-                server.log(['app', 'error'], `Error creating new address: ${error}`)
+                logger.error(`Error creating new address: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -126,7 +126,7 @@ exports.register = (server, options, next) => {
                 const addressMapping = await models.AddressMapping.update(postBody, {where: { id: addressMappingId } })
                 addressMapping ?  reply(addressMapping) : reply(Boom.notFound)
             } catch(err) {
-                server.log(['app', 'error'], `Error updating address: ${error}`)
+                logger.error(`Error updating address: ${error}`)
                 reply(Boom.badImplementation)
             }
         },
@@ -150,7 +150,7 @@ exports.register = (server, options, next) => {
                 const addressMapping = await models.AddressMapping.destroy({ where: { EntityId } })
                 reply(addressMapping)
             } catch(err) {
-                server.log(['app', 'error'], `Error deleting address: ${error}`)
+                logger.error(`Error deleting address: ${error}`)
                 reply(Boom.badImplementation)
             }
             
