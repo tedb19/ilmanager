@@ -12,15 +12,15 @@ import DADRoutes from './DAD/dad.routes'
 import QueueRoutes from './IL/queue.routes'
 
 export const routesPlugins = [
-    { register: entityRoutes },
-    { register: webRoutes },
-    { register: messageTypeRoutes },
-    { register: subscriberRoutes },
-    { register: statsRoutes },
-    { register: logsRoutes },
-    { register: addressMappingRoutes },
-    { register: labOrderRoutes },
-    { register: labResultRoutes },
-    { register: DADRoutes },
-    { register: QueueRoutes }
+  { register: entityRoutes },
+  { register: webRoutes },
+  { register: messageTypeRoutes },
+  { register: subscriberRoutes },
+  { register: statsRoutes },
+  { register: logsRoutes },
+  { register: addressMappingRoutes },
+  { register: labOrderRoutes },
+  { register: labResultRoutes },
+  { register: DADRoutes },
+  { register: QueueRoutes }
 ]

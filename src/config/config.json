@@ -1,12 +1,15 @@
 {
   "development": {
-    "username": "root",
-    "password": "maun",
+    "username": "sa",
+    "password": "c0nstella",
     "database": "interopdb_dev",
     "host": "localhost",
-    "dialect": "mysql",
+    "dialect": "mssql",
     "logging": false,
-    "operatorsAliases": false
+    "operatorsAliases": false,
+    "options": {
+      "instanceName": "SQLEXPRESS"
+    }
   },
   "test": {
     "dialect": "sqlite",
@@ -28,17 +31,5 @@
     "dialect": "mysql",
     "logging": false,
     "operatorsAliases": false
-  },
-  "iqcare": {
-    "username": "sa",
-    "password": "c0nstella",
-    "database": "interopdb_dev",
-    "host": "localhost",
-    "dialect": "mssql",
-    "logging": false,
-    "operatorsAliases": false,
-    "options": {
-      "instanceName": "SQLEXPRESS"
-    }
   }
 }

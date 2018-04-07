@@ -1,21 +1,21 @@
-"use strict";
+'use strict'
 
-module.exports = function(sequelize, DataTypes) {
-  let AddressMapping = sequelize.define("AddressMapping", {
+module.exports = function (sequelize, DataTypes) {
+  let AddressMapping = sequelize.define('AddressMapping', {
     protocol: {
-        type:   DataTypes.ENUM,
-        values: ["TCP", "HTTP", "HTTPS"],
-        defaultValue: 'HTTP'
+      type: DataTypes.ENUM,
+      values: ['TCP', 'HTTP', 'HTTPS'],
+      defaultValue: 'HTTP'
     },
     address: DataTypes.STRING(256),
     status: {
-      type:   DataTypes.ENUM,
+      type: DataTypes.ENUM,
       values: ['ACTIVE', 'INACTIVE'],
       defaultValue: 'ACTIVE'
     }
   })
-  
-  AddressMapping.associate = function(models) {
+
+  AddressMapping.associate = function (models) {
     AddressMapping.belongsTo(models.Entity)
   }
   return AddressMapping

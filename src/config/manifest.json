@@ -69,7 +69,6 @@
     { "plugin": "inert" },
     { "plugin": "vision" },
     { "plugin": "lout", "options": { "endpoint": "/api/docs" }},
-    //routes
     { "plugin": "../routes/addressmapping.routes"},
     { "plugin": "../routes/entity.routes"},
     { "plugin": "../routes/logs.routes"},
