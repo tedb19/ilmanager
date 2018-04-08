@@ -33,6 +33,18 @@ const pruneQueue = async () => {
   })
 }
 
+export const updateLog = async (queue, level, log) => {
+  const logs = await models.Logs.findAll({ where: { QueueId: queue.id } })
+  const updatedLog = {
+    log,
+    level
+  }
+
+  logs.length
+    ? await models.Logs.update(updatedLog, {where: { QueueId: queue.id }})
+    : await models.Logs.create({...updatedLog, QueueId: queue.id})
+}
+
 export const processAllQueued = async () => {
   const queuedMessages = await models.Queue.findAll({ where: { status: 'QUEUED' } })
   for (let queuedMessage of queuedMessages) {
@@ -73,21 +85,17 @@ export const processQueued = async (queue) => {
       ]
       await Promise.all([
         queue.update({ status: 'SENT', sendDetails: sentLog, noOfAttempts: `${queue.noOfAttempts + 1}` }),
-        updateNumericStats(statsChanges)
+        updateNumericStats(statsChanges),
+        updateLog(queue, 'INFO', sentLog)
       ])
-
-      const logs = await models.Logs.findAll({ where: { level: 'INFO', QueueId: queue.id } })
-      if (!logs.length) await models.Logs.create({level: 'INFO', log: sentLog, QueueId: queue.id})
     })
 
     client.on('error', async (error) => {
       let queueLog = `An attempt was made to send ${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${addressMapping.address}), 
             but there was an error encountered => ${error}. This message has been queued.`
 
-      if (queue.noOfAttempts === 0) {
-        const logs = await models.Logs.findAll({ where: { level: 'WARNING', QueueId: queue.id } })
-        if (!logs.length) await models.Logs.create({level: 'WARNING', log: queueLog, QueueId: queue.id})
-      }
+      if (queue.noOfAttempts === 0) await updateLog(queue, 'WARNING', queueLog)
+
       await queue.update({
         sendDetails: queueLog,
         noOfAttempts: `${queue.noOfAttempts + 1}`
@@ -103,18 +111,18 @@ export const processQueued = async (queue) => {
           {name: 'QUEUED', increment: false}
         ]
         await Promise.all([
-          models.Logs.create({level: 'INFO', log: sentLog, QueueId: queue.id}),
           queue.update({ status: 'SENT', sendDetails: sentLog, noOfAttempts: `${queue.noOfAttempts + 1}` }),
-          updateNumericStats(statsChanges)
+          updateNumericStats(statsChanges),
+          updateLog(queue, 'INFO', sentLog)
         ])
       } else {
         throw response
       }
     } catch (error) {
       let queueLog = `An attempt was made to send ${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${addressMapping.address}), but there was an error encountered => ${error.message}. This message has been queued`
-      if (queue.noOfAttempts === 0) {
-        await models.Logs.create({ level: 'WARNING', log: queueLog, QueueId: queue.id })
-      }
+
+      if (queue.noOfAttempts === 0) await updateLog(queue, 'WARNING', queueLog)
+
       await queue.update({
         sendDetails: queueLog,
         noOfAttempts: `${queue.noOfAttempts + 1}`
