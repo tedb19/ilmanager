@@ -1,9 +1,9 @@
 import Path from 'path'
 
 exports.register = (server, options, next) => {
-  const ILServer = server.select('web-ui')
+  const webServer = server.select('web-ui')
 
-  ILServer.route({
+  webServer.route({
     method: 'GET',
     path: '/{path*}',
     handler: {
@@ -18,7 +18,8 @@ exports.register = (server, options, next) => {
       tags: ['react', 'web app', 'client'],
       notes: 'serves the react web app',
       cors: {
-        origin: ['*']
+        origin: ['*'],
+        additionalHeaders: ['cache-control', 'x-requested-with']
       }
     }
   })

@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
   })
 
   Entity.associate = function (models) {
-    Entity.belongsToMany(models.MessageType, {through: models.Subscriber})
+    Entity.belongsToMany(models.MessageType, { through: models.Subscriber })
     Entity.hasMany(models.AddressMapping)
     Entity.hasMany(models.Queue)
   }

@@ -67,7 +67,7 @@ exports.register = (server, options, next) => {
     method: 'GET',
     handler: async (request, reply) => {
       try {
-        const [ entity ] = await models.Entity.findAll({ where: { name: request.params.entityName } })
+        const [entity] = await models.Entity.findAll({ where: { name: request.params.entityName } })
         const messageTypes = await getSubscribedMessageTypes(entity)
         reply(messageTypes)
       } catch (error) {
@@ -117,7 +117,7 @@ exports.register = (server, options, next) => {
       try {
         const entityId = request.params.id
         let postBody = request.payload
-        const entity = await models.Entity.update(postBody, {where: { id: entityId }})
+        const entity = await models.Entity.update(postBody, { where: { id: entityId } })
         entity ? reply(entity) : reply(Boom.notFound)
       } catch (error) {
         logger.error(`Error updating entity: ${error}`)

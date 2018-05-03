@@ -2,8 +2,26 @@ import models from '../../models'
 import { getMessageTypeObj, getSubscribedEntities, updateStats } from '../../logic/db.manipulation'
 import { getMessageTypeName, getSendingApplication, getRandomIdentifier, getMsgRecepients, getCCCNumber } from './message.manipulation'
 import { updateNumericStats, updateMsgStats } from '../../logic/stats.logic'
+import { logger } from '../../utils/logger.utils'
 
-export const saveIncomingToQueue = async (payload) => {
+export const savePayload = async (payload) => {
+  let response = ''
+  try {
+    const parsedPayload = JSON.parse(payload)
+    const identifier = getCCCNumber(parsedPayload)
+    if (identifier && identifier.ID) {
+      await saveJSONToQueue(parsedPayload)
+      response = JSON.stringify({ msg: 'successfully received by the Interoperability Layer (IL)' })
+    } else {
+      response = JSON.stringify({ msg: 'No CCC Number specified! This message will not be shared with the systems as it does not follow the standard!' })
+    }
+  } catch (error) {
+    logger.error(`Error while saving payload: ${error}`)
+  }
+  return response
+}
+
+export const saveJSONToQueue = async (payload) => {
   const messageTypeName = getMessageTypeName(payload)
   const sendingApplication = getSendingApplication(payload)
   const messageType = await getMessageTypeObj(messageTypeName)
@@ -21,9 +39,9 @@ export const saveIncomingToQueue = async (payload) => {
   }
 
   await Promise.all([
-    models.Logs.create({level: 'INFO', log: receivedMsgLog}),
+    models.Logs.create({ level: 'INFO', log: receivedMsgLog }),
     updateStats(messageType),
-    updateNumericStats([{name: 'RECEIVED', increment: true}])
+    updateNumericStats([{ name: 'RECEIVED', increment: true }])
   ])
 
   for (let msgRecepient of msgRecepients) {
@@ -38,4 +56,35 @@ export const saveIncomingToQueue = async (payload) => {
   await updateMsgStats('QUEUED')
   await updateMsgStats('SENT')
   return { CCCNumber, msgRecepients }
+}
+
+export const saveXMLToQueue = async (payload) => {
+  const messageTypeName = 'MOH731^ADX'
+  try {
+    const messageType = await getMessageTypeObj(messageTypeName)
+    const entities = await getSubscribedEntities(messageType)
+    const receivedMsgLog = `Received ADX message successfully. Subscribers include ${entities.map(entity => entity.name).join(',')}`
+
+    await Promise.all([
+      models.Logs.create({ level: 'INFO', log: receivedMsgLog }),
+      updateStats(messageType),
+      updateNumericStats([{ name: 'RECEIVED', increment: true }])
+    ])
+
+    for (const entity of entities) {
+      await models.Queue.create({
+        message: payload,
+        sendDetails: receivedMsgLog,
+        noOfAttempts: 0,
+        EntityId: entity.id,
+        status: 'QUEUED',
+        type: 'XML'
+      })
+    }
+
+    await updateMsgStats('QUEUED')
+    await updateMsgStats('SENT')
+  } catch (error) {
+    logger.error(error)
+  }
 }

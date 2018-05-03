@@ -56,5 +56,17 @@ export const settings = [
     description: 'Data Acquisition and Dispersal System (DAD) TCP Listener',
     value: `http://localhost:9720`,
     isUpdatable: false
+  }, {
+    id: 10,
+    description: 'IL Super user',
+    value: 'super',
+    isUpdatable: false,
+    display: false
+  }, {
+    id: 11,
+    description: 'IL Super password',
+    value: 'maun2806;',
+    isUpdatable: false,
+    display: false
   }
 ]

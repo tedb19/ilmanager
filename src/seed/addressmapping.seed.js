@@ -3,6 +3,5 @@ import models from '../models'
 export const seedaddressMappings = () => models.AddressMapping.bulkCreate(addressMappings)
 
 export const addressMappings = [
-  {id: 1, protocol: 'TCP', address: '127.0.0.1:9000', status: 'ACTIVE', EntityId: 1},
-  {id: 2, protocol: 'HTTP', address: '127.0.0.1:9001', status: 'ACTIVE', EntityId: 2}
+  { id: 1, protocol: 'HTTP', address: 'https://test.hiskenya.org/kenya', status: 'ACTIVE', EntityId: 8 }
 ]

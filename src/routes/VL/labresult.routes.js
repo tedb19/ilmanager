@@ -2,7 +2,7 @@ import Boom from 'boom'
 
 import models from '../../models'
 import { logger } from '../../utils/logger.utils'
-import { saveIncomingToQueue } from '../DAD/processMessage'
+import { saveJSONToQueue } from '../DAD/saveIncomingToQueue'
 import { generatePayload } from './labresult.payload'
 
 exports.register = (server, options, next) => {
@@ -14,7 +14,7 @@ exports.register = (server, options, next) => {
     handler: async (request, reply) => {
       const log = `Received Viral Result via API endpoint: ${request.payload}`
       logger.info(log)
-      models.Logs.create({level: 'INFO', log})
+      models.Logs.create({ level: 'INFO', log })
       // save the lab result
       reply(true)
     },
@@ -42,7 +42,7 @@ exports.register = (server, options, next) => {
         if (message.startsWith('IL')) {
           const encodedVL = message.slice(3)
           const decodedVL = Buffer.from(encodedVL, 'base64').toString('utf-8')
-          server.log(['app', 'lab', 'info'], `Decoded sms: ${decodedVL}`)
+          logger.info(`Decoded sms: ${decodedVL}`)
           const payload = decodedVL.split(',')
           let labResult = {}
           labResult.labResultId = payload[0].split(':')[1].trim()
@@ -59,13 +59,13 @@ exports.register = (server, options, next) => {
           labResult.lab = payload[11].split(':')[1].trim()
 
           const VLpayload = await generatePayload(labResult)
-          await saveIncomingToQueue(VLpayload)
-          reply({msg: 'results saved successfully!'})
+          await saveJSONToQueue(VLpayload)
+          reply({ msg: 'results saved successfully!' })
         } else {
-          reply({msg: 'Not a valid VL result!'})
+          reply({ msg: 'Not a valid VL result!' })
         }
       } catch (error) {
-        server.log(['app', 'lab', 'error'], error)
+        logger.error(`An error was encountered when processing viral load: ${error}`)
         reply(Boom.badImplementation)
       }
     },

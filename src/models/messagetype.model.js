@@ -22,7 +22,7 @@ module.exports = function (sequelize, DataTypes) {
   })
 
   MessageType.associate = function (models) {
-    MessageType.belongsToMany(models.Entity, {through: models.Subscriber})
+    MessageType.belongsToMany(models.Entity, { through: models.Subscriber })
   }
 
   return MessageType

@@ -2,34 +2,52 @@
  * This is the Data Acquisation and Dispersal Module
  *
  */
-import Boom from 'boom'
-
-import { saveIncomingToQueue } from './processMessage'
-import { logger } from '../../utils/logger.utils'
+import { saveXMLToQueue, savePayload } from './saveIncomingToQueue'
 
 exports.register = (server, options, next) => {
   const ILServer = server.select('DAD')
 
   ILServer.route({
-    path: '/api/',
+    path: '/api',
     method: 'POST',
     handler: async (request, reply) => {
       let { payload } = request
-
-      try {
-        const result = await saveIncomingToQueue(payload)
-        let response = ''
-        result.CCCNumber
-          ? response = JSON.stringify({ msg: 'successfully received by the Interoperability Layer (IL)' })
-          : response = Boom.notAcceptable('No CCC Number specified! This message will still be sent out')
-        reply(response)
-      } catch (error) {
-        logger.error(`Error : ${error}`)
-        reply(Boom.badImplementation)
-      }
+      const response = await savePayload(JSON.stringify(payload))
+      reply(response)
     },
     config: {
       description: 'The endpoint for receiving incoming messages.',
+      tags: ['entity', 'participating system'],
+      notes: 'should return the created entity',
+      cors: {
+        origin: ['*'],
+        additionalHeaders: ['cache-control', 'x-requested-with']
+      }
+    }
+  })
+
+  ILServer.ext('onRequest', function (request, reply) {
+    if (request.method === 'post' && (request.headers['content-type'] === 'application/xml+adx')) {
+      request.setUrl('/api/adx')
+    }
+    return reply.continue()
+  })
+
+  ILServer.route({
+    path: '/api/adx',
+    method: 'POST',
+    handler: async (request, reply) => {
+      let { payload } = request
+      let log = { log: 'ADX message successfully received by the Interoperability Layer (IL)', level: 'INFO' }
+      await saveXMLToQueue(Buffer.from(payload).toString())
+      reply({ msg: log.log })
+    },
+    config: {
+      payload: {
+        parse: false,
+        allow: 'application/xml+adx'
+      },
+      description: 'The endpoint for receiving incoming ADX messages.',
       tags: ['entity', 'participating system'],
       notes: 'should return the created entity',
       cors: {

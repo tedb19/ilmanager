@@ -8,7 +8,7 @@ exports.register = (server, options, next) => {
   const ILServer = server.select('IL')
 
   ILServer.route({
-    path: '/api/stats/',
+    path: '/api/stats',
     method: 'GET',
     handler: async (request, reply) => {
       try {
@@ -32,7 +32,7 @@ exports.register = (server, options, next) => {
   })
 
   ILServer.route({
-    path: '/api/stats/',
+    path: '/api/stats',
     method: 'POST',
     handler: async (request, reply) => {
       let newStat = request.payload

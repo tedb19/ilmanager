@@ -4,6 +4,7 @@ import { seedSubscribers } from './subscriber.seed'
 import { seedStats } from './stats.seed'
 import { seedLabCodes } from './labcode.seed'
 import { seedSettings } from './settings.seed'
+import { seedaddressMappings } from './addressmapping.seed'
 
 import models from '../models'
 
@@ -18,7 +19,7 @@ export const initializeDb = async (options = { force: false }) => {
       message.msg = `Data seeding skipped`
     } else {
       await Promise.all([seedEntities(), seedMessageTypes(), seedStats(), seedLabCodes(), seedSettings()])
-      await seedSubscribers()
+      await Promise.all([seedSubscribers(), seedaddressMappings()])
       message.level = 'info'
       message.msg = 'All seed data saved successfully!'
     }
@@ -26,6 +27,5 @@ export const initializeDb = async (options = { force: false }) => {
     message.level = 'error'
     message.msg = `Error seeding data: ${error}`
   }
-
   return message
 }

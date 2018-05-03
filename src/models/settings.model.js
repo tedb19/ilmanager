@@ -10,6 +10,10 @@ module.exports = function (sequelize, DataTypes) {
     isUpdatable: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    display: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   })
 

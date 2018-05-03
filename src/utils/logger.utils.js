@@ -12,7 +12,7 @@ export const logger = bunyan.createLogger({
     },
     {
       type: 'rotating-file',
-      path: `logs-${new Date().toDateString()}`,
+      path: `logs-${new Date().toDateString()}.json`,
       period: '1d', // daily rotation
       count: 10,
       json: false

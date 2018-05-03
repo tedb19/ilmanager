@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch'
 import net from 'net'
+import base64 from 'base-64'
 
 export const messageDispatcher = {
   sendHTTP: async (address, payload) => {
@@ -7,6 +8,16 @@ export const messageDispatcher = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
+      },
+      body: payload
+    })
+  },
+  sendToDHIS2: async (address, payload, user) => {
+    return fetch(address, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/xml+adx',
+        'Authorization': 'Basic ' + base64.encode(user.username + ':' + user.password)
       },
       body: payload
     })

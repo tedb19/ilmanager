@@ -6,6 +6,11 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT('long'),
       allowNull: false
     },
+    type: {
+      type: DataTypes.ENUM,
+      values: ['JSON', 'XML'],
+      defaultValue: 'JSON'
+    },
     noOfAttempts: {
       type: DataTypes.INTEGER,
       allowNull: false
