@@ -1,6 +1,10 @@
 import models from '../models'
 import { getMessageTypeObj } from './db.manipulation'
-import { getMessageTypeName, getRandomIdentifier, getCCCNumber } from '../routes/DAD/message.manipulation'
+import {
+  getMessageTypeName,
+  getRandomIdentifier,
+  getCCCNumber
+} from '../routes/DAD/message.manipulation'
 import { messageDispatcher } from '../routes/DAD/messagedispatcher'
 import { updateNumericStats, updateMsgStats } from './stats.logic'
 import { logger } from '../utils/logger.utils'
@@ -55,7 +59,7 @@ export const processAllQueued = async () => {
   await updateMsgStats('SENT')
 }
 
-export const processQueued = async (queue) => {
+export const processQueued = async queue => {
   if (queue.type === 'JSON') {
     const payload = JSON.parse(queue.message)
     const messageTypeName = getMessageTypeName(payload)
@@ -77,16 +81,27 @@ export const processQueued = async (queue) => {
     }
 
     if (addressMapping.protocol === 'TCP') {
-      const client = await messageDispatcher.sendTCP(addressMapping.address, JSON.stringify(payload))
+      const client = await messageDispatcher.sendTCP(
+        addressMapping.address,
+        JSON.stringify(payload)
+      )
 
-      client.on('data', async (data) => {
-        let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) sent to ${entity.name} successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
+      client.on('data', async data => {
+        let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${
+          identifier.IDENTIFIER_TYPE
+        } : ${identifier.ID}) sent to ${
+          entity.name
+        } successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
         const statsChanges = [
           { name: 'SENT', increment: true },
           { name: 'QUEUED', increment: false }
         ]
         await Promise.all([
-          queue.update({ status: 'SENT', sendDetails: sentLog, noOfAttempts: `${queue.noOfAttempts + 1}` }),
+          queue.update({
+            status: 'SENT',
+            sendDetails: sentLog,
+            noOfAttempts: `${queue.noOfAttempts + 1}`
+          }),
           updateNumericStats(statsChanges),
           updateLog(queue, 'INFO', sentLog)
         ])
@@ -94,8 +109,13 @@ export const processQueued = async (queue) => {
         client.destroy()
       })
 
-      client.on('error', async (error) => {
-        let queueLog = `An attempt was made to send ${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${addressMapping.address}), 
+      client.on('error', async error => {
+        let queueLog = `An attempt was made to send ${messageType.verboseName.replace(
+          /_/g,
+          ' '
+        )} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${
+          addressMapping.address
+        }), 
             but there was an error encountered => ${error}. This message has been queued.`
 
         if (queue.noOfAttempts === 0) await updateLog(queue, 'WARNING', queueLog)
@@ -109,16 +129,27 @@ export const processQueued = async (queue) => {
       })
     } else {
       try {
-        const response = await messageDispatcher.sendHTTP(addressMapping.address, JSON.stringify(payload))
+        const response = await messageDispatcher.sendHTTP(
+          addressMapping.address,
+          JSON.stringify(payload)
+        )
         response.text().catch(console.error)
         if (response.ok) {
-          let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) sent to ${entity.name} successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
+          let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${
+            identifier.IDENTIFIER_TYPE
+          } : ${identifier.ID}) sent to ${
+            entity.name
+          } successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
           const statsChanges = [
             { name: 'SENT', increment: true },
             { name: 'QUEUED', increment: false }
           ]
           await Promise.all([
-            queue.update({ status: 'SENT', sendDetails: sentLog, noOfAttempts: `${queue.noOfAttempts + 1}` }),
+            queue.update({
+              status: 'SENT',
+              sendDetails: sentLog,
+              noOfAttempts: `${queue.noOfAttempts + 1}`
+            }),
             updateNumericStats(statsChanges),
             updateLog(queue, 'INFO', sentLog)
           ])
@@ -126,7 +157,12 @@ export const processQueued = async (queue) => {
           throw response
         }
       } catch (error) {
-        let queueLog = `An attempt was made to send ${messageType.verboseName.replace(/_/g, ' ')} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${addressMapping.address}), but there was an error encountered => ${error.message}. This message has been queued`
+        let queueLog = `An attempt was made to send ${messageType.verboseName.replace(
+          /_/g,
+          ' '
+        )} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${
+          addressMapping.address
+        }), but there was an error encountered => ${error.message}. This message has been queued`
 
         if (queue.noOfAttempts === 0) await updateLog(queue, 'WARNING', queueLog)
 
@@ -138,21 +174,35 @@ export const processQueued = async (queue) => {
     }
   } else {
     try {
-      const [dhisUsername] = await models.Settings.findAll({ where: { description: 'DHIS2 Username' } })
-      const [dhisPassword] = await models.Settings.findAll({ where: { description: 'DHIS2 Password' } })
+      const [dhisUsername] = await models.Settings.findAll({
+        where: { description: 'DHIS2 Username' }
+      })
+      const [dhisPassword] = await models.Settings.findAll({
+        where: { description: 'DHIS2 Password' }
+      })
       const [entity] = await models.Entity.findAll({ where: { name: 'DHIS2' } })
       const [address] = await models.AddressMapping.findAll({ where: { EntityId: entity.id } })
-      let user = { username: dhisUsername.dataValues.value, password: dhisPassword.dataValues.value }
+      let user = {
+        username: dhisUsername.dataValues.value,
+        password: dhisPassword.dataValues.value
+      }
+
       const response = await messageDispatcher.sendToDHIS2(address.address, queue.message, user)
-      response.text().catch(console.error)
+
       if (response.ok) {
-        let sentLog = `MOH 731 ADX message sent to ${entity.name} successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
+        let sentLog = `MOH 731 ADX message sent to ${
+          entity.name
+        } successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
         const statsChanges = [
           { name: 'SENT', increment: true },
           { name: 'QUEUED', increment: false }
         ]
         await Promise.all([
-          queue.update({ status: 'SENT', sendDetails: sentLog, noOfAttempts: `${queue.noOfAttempts + 1}` }),
+          queue.update({
+            status: 'SENT',
+            sendDetails: sentLog,
+            noOfAttempts: `${queue.noOfAttempts + 1}`
+          }),
           updateNumericStats(statsChanges),
           updateLog(queue, 'INFO', sentLog)
         ])
@@ -162,7 +212,11 @@ export const processQueued = async (queue) => {
     } catch (error) {
       const [entity] = await models.Entity.findAll({ where: { name: 'DHIS2' } })
       const [address] = await models.AddressMapping.findAll({ where: { EntityId: entity.id } })
-      let queueLog = `An attempt was made to send MOH 731 ADX message to ${entity.name} (Address: ${address.address}), but there was an error encountered => ${JSON.stringify(error)}. This message has been queued`
+      let queueLog = `An attempt was made to send MOH 731 ADX message to ${entity.name} (Address: ${
+        address.address
+      }), but there was an error encountered => ${JSON.stringify(
+        error
+      )}. This message has been queued`
 
       if (queue.noOfAttempts === 0) await updateLog(queue, 'WARNING', queueLog)
 

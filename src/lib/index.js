@@ -41,13 +41,19 @@ if (cluster.isMaster) {
       logger.info(message.msg)
       await server.start()
 
-      tcpServer.on('error', (err) => logger.error(`An error occured on the TCP server ${err}`))
-      tcpServer.listen(AppPorts.DAD_TCP, () => logger.info(`TCP Listener bound on port ${AppPorts.DAD_TCP}`))
+      tcpServer.on('error', err => logger.error(`An error occured on the TCP server ${err}`))
+      tcpServer.listen(AppPorts.DAD_TCP, () =>
+        logger.info(`TCP Listener bound on port ${AppPorts.DAD_TCP}`)
+      )
 
       logger.info(`Viral Load API Server started @ ${server.select('VL').info.uri}`)
       logger.info(`Interoperability Layer API Server started @ ${server.select('IL').info.uri}`)
-      logger.info(`Interoperability Layer Web Interface running @ ${server.select('web-ui').info.uri}`)
-      logger.info(`Data Acquisition and Dispersal System (DAD) running @ ${server.select('DAD').info.uri}`)
+      logger.info(
+        `Interoperability Layer Web Interface running @ ${server.select('web-ui').info.uri}`
+      )
+      logger.info(
+        `Data Acquisition and Dispersal System (DAD) running @ ${server.select('DAD').info.uri}`
+      )
     } catch (error) {
       logger.error(`An error occured when initializing the server: ${error}`)
       process.exit(1)

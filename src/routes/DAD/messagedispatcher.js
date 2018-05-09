@@ -16,8 +16,9 @@ export const messageDispatcher = {
     return fetch(address, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/xml+adx',
-        'Authorization': 'Basic ' + base64.encode(user.username + ':' + user.password)
+        'Content-Type': 'application/adx+xml',
+        Authorization: 'Basic ' + base64.encode(user.username + ':' + user.password),
+        Accept: 'application/adx+xml'
       },
       body: payload
     })

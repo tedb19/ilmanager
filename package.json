@@ -4,13 +4,16 @@
   "description": "The backend API for the IL(Interoperability Layer) Manager",
   "main": "src/lib/index.js",
   "scripts": {
-    "start": "nodemon src/lib/index.js --exec babel-node --presets es2015,stage-3 --ignore 'logs/*.json'",
+    "start":
+      "nodemon src/lib/index.js --exec babel-node --presets es2015,stage-3 --ignore 'logs*.json'",
     "prebuild": "rimraf dist",
     "build": "babel --copy-files --out-dir dist/src src && npm run prep:dependencies",
-    "prep:dependencies": "npm prune --production && cp -Rf node_modules dist/node_modules --verbose",
+    "prep:dependencies":
+      "npm prune --production && cp -Rf node_modules dist/node_modules --verbose",
     "serve": "node dist/src/lib/index.js",
     "test": "lab -t 100 -S -c -v -T  ./node_modules/lab-babel -I __core-js_shared__ ./test/",
-    "cover": "lab -S -T ./node_modules/lab-babel -I __core-js_shared__ -r html -o ./test/coverage.html ./test/"
+    "cover":
+      "lab -S -T ./node_modules/lab-babel -I __core-js_shared__ -r html -o ./test/coverage.html ./test/"
   },
   "author": "Teddy Odhiambo",
   "license": "ISC",
@@ -51,13 +54,11 @@
     "tedious": "^2.1.5",
     "vision": "^4.1.1"
   },
+  "nodemonConfig": {
+    "ignore": ["logs*", "README.md"]
+  },
   "babel": {
-    "presets": [
-      "stage-3",
-      "es2015"
-    ],
-    "plugins": [
-      "transform-runtime"
-    ]
+    "presets": ["stage-3", "es2015"],
+    "plugins": ["transform-runtime"]
   }
 }
