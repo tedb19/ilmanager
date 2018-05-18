@@ -1,32 +1,28 @@
-const Code = require('code')
-const Lab = require('lab')
-const server = require('../../src/lib/index')
+import { expect } from 'chai'
+import { testServer } from '../server/testServer'
 
-const lab = exports.lab = Lab.script()
-
-const describe = lab.describe
-const it = lab.it
-const expect = Code.expect
-
-describe('GET /api/entities', () => {
+describe('GET /api/entities', async () => {
+  const server = await testServer()
   const request = {
     method: 'GET',
     url: '/api/entities'
   }
 
-  it('returns HTTP Status Code 200', (done) => {
-    server.select('IL').inject(request, (response) => {
-      expect(response.statusCode).to.equal(200)
+  it('returns HTTP Status Code 200', done => {
+    server.select('IL').inject(request, response => {
+      expect(JSON.parse(response.statusCode)).to.equal(200)
       done()
     })
   })
 
-  it('returns an array', (done) => {
-    server.select('IL').inject(request, (response) => {
-      console.log('response.payload', response.payload)
-      console.log('response.result', response.result)
-      expect(response.payload).to.be.an.array()
-      done()
-    })
+  it('returns an array', done => {
+    try {
+      server.select('IL').inject(request, response => {
+        expect(JSON.parse(response.payload)).to.be.an('array')
+        done()
+      })
+    } catch (err) {
+      console.log('Test Error', err)
+    }
   })
 })

@@ -3,7 +3,7 @@ import bformat from 'bunyan-format'
 
 const formatOut = bformat({ outputMode: 'short' })
 
-export const logger = bunyan.createLogger({
+const logger = bunyan.createLogger({
   name: 'IL',
   streams: [
     {
@@ -19,3 +19,9 @@ export const logger = bunyan.createLogger({
     }
   ]
 })
+
+if (process.env.NODE_ENV === 'test') {
+  logger.level(bunyan.FATAL + 1)
+}
+
+module.exports = { logger }

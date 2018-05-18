@@ -1,0 +1,46 @@
+{
+  "server": {
+    "app": {
+      "description": "Interoperability Layer for the HIS projects"
+    },
+    "connections": {
+      "router": {
+        "isCaseSensitive": true,
+        "stripTrailingSlash": true
+      }
+    }
+  },
+  "connections": [
+    {
+      "port": 5000,
+      "labels": ["web-ui"]
+    },
+    {
+      "port": 3003,
+      "labels": ["IL"]
+    },
+    {
+      "port": 3007,
+      "labels": ["VL"]
+    },
+    {
+      "port": 9721,
+      "labels": ["DAD"]
+    }
+  ],
+  "registrations": [
+    { "plugin": { "register": "inert" } },
+    { "plugin": { "register": "vision" } },
+    { "plugin": { "register": "../../src/routes/IL/addressmapping.routes" } },
+    { "plugin": { "register": "../../src/routes/IL/entity.routes" } },
+    { "plugin": { "register": "../../src/routes/IL/logs.routes" } },
+    { "plugin": { "register": "../../src/routes/IL/messagetype.routes" } },
+    { "plugin": { "register": "../../src/routes/IL/queue.routes" } },
+    { "plugin": { "register": "../../src/routes/IL/settings.routes" } },
+    { "plugin": { "register": "../../src/routes/IL/stats.routes" } },
+    { "plugin": { "register": "../../src/routes/IL/subscriber.routes" } },
+    { "plugin": { "register": "../../src/routes/VL/laborder.routes" } },
+    { "plugin": { "register": "../../src/routes/VL/labresult.routes" } },
+    { "plugin": { "register": "../../src/routes/web-ui/web.routes" } }
+  ]
+}

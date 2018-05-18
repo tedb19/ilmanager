@@ -51,7 +51,9 @@ export const updateLog = async (queue, level, log) => {
 }
 
 export const processAllQueued = async () => {
-  const queuedMessages = await models.Queue.findAll({ where: { status: 'QUEUED' } })
+  const queuedMessages = await models.Queue.findAll({
+    where: { status: 'QUEUED' }
+  })
   for (let queuedMessage of queuedMessages) {
     await processQueued(queuedMessage)
   }
@@ -67,7 +69,9 @@ export const processQueued = async queue => {
       getMessageTypeObj(messageTypeName),
       models.Entity.findById(queue.EntityId)
     ])
-    const [addressMapping] = await models.AddressMapping.findAll({ where: { EntityId: entity.id } })
+    const [addressMapping] = await models.AddressMapping.findAll({
+      where: { EntityId: entity.id }
+    })
     const CCCNumber = getCCCNumber(payload)
 
     let identifier = {}
@@ -92,10 +96,12 @@ export const processQueued = async queue => {
         } : ${identifier.ID}) sent to ${
           entity.name
         } successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
+
         const statsChanges = [
           { name: 'SENT', increment: true },
           { name: 'QUEUED', increment: false }
         ]
+
         await Promise.all([
           queue.update({
             status: 'SENT',
@@ -105,6 +111,7 @@ export const processQueued = async queue => {
           updateNumericStats(statsChanges),
           updateLog(queue, 'INFO', sentLog)
         ])
+
         client.end()
         client.destroy()
       })
@@ -113,12 +120,14 @@ export const processQueued = async queue => {
         let queueLog = `An attempt was made to send ${messageType.verboseName.replace(
           /_/g,
           ' '
-        )} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${
-          addressMapping.address
-        }), 
+        )} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${
+          entity.name
+        } (Address: ${addressMapping.address}), 
             but there was an error encountered => ${error}. This message has been queued.`
 
-        if (queue.noOfAttempts === 0) await updateLog(queue, 'WARNING', queueLog)
+        if (queue.noOfAttempts === 0) {
+          await updateLog(queue, 'WARNING', queueLog)
+        }
 
         await queue.update({
           sendDetails: queueLog,
@@ -135,9 +144,12 @@ export const processQueued = async queue => {
         )
         response.text().catch(console.error)
         if (response.ok) {
-          let sentLog = `${messageType.verboseName.replace(/_/g, ' ')} message (${
-            identifier.IDENTIFIER_TYPE
-          } : ${identifier.ID}) sent to ${
+          let sentLog = `${messageType.verboseName.replace(
+            /_/g,
+            ' '
+          )} message (${identifier.IDENTIFIER_TYPE} : ${
+            identifier.ID
+          }) sent to ${
             entity.name
           } successfully! Total send attempts: ${queue.noOfAttempts + 1}.`
           const statsChanges = [
@@ -160,11 +172,17 @@ export const processQueued = async queue => {
         let queueLog = `An attempt was made to send ${messageType.verboseName.replace(
           /_/g,
           ' '
-        )} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${entity.name} (Address: ${
+        )} message (${identifier.IDENTIFIER_TYPE} : ${identifier.ID}) to ${
+          entity.name
+        } (Address: ${
           addressMapping.address
-        }), but there was an error encountered => ${error.message}. This message has been queued`
+        }), but there was an error encountered => ${
+          error.message
+        }. This message has been queued`
 
-        if (queue.noOfAttempts === 0) await updateLog(queue, 'WARNING', queueLog)
+        if (queue.noOfAttempts === 0) {
+          await updateLog(queue, 'WARNING', queueLog)
+        }
 
         await queue.update({
           sendDetails: queueLog,
@@ -181,13 +199,19 @@ export const processQueued = async queue => {
         where: { description: 'DHIS2 Password' }
       })
       const [entity] = await models.Entity.findAll({ where: { name: 'DHIS2' } })
-      const [address] = await models.AddressMapping.findAll({ where: { EntityId: entity.id } })
+      const [address] = await models.AddressMapping.findAll({
+        where: { EntityId: entity.id }
+      })
       let user = {
         username: dhisUsername.dataValues.value,
         password: dhisPassword.dataValues.value
       }
 
-      const response = await messageDispatcher.sendToDHIS2(address.address, queue.message, user)
+      const response = await messageDispatcher.sendToDHIS2(
+        address.address,
+        queue.message,
+        user
+      )
 
       if (response.ok) {
         let sentLog = `MOH 731 ADX message sent to ${
@@ -197,6 +221,7 @@ export const processQueued = async queue => {
           { name: 'SENT', increment: true },
           { name: 'QUEUED', increment: false }
         ]
+
         await Promise.all([
           queue.update({
             status: 'SENT',
@@ -211,8 +236,12 @@ export const processQueued = async queue => {
       }
     } catch (error) {
       const [entity] = await models.Entity.findAll({ where: { name: 'DHIS2' } })
-      const [address] = await models.AddressMapping.findAll({ where: { EntityId: entity.id } })
-      let queueLog = `An attempt was made to send MOH 731 ADX message to ${entity.name} (Address: ${
+      const [address] = await models.AddressMapping.findAll({
+        where: { EntityId: entity.id }
+      })
+      let queueLog = `An attempt was made to send MOH 731 ADX message to ${
+        entity.name
+      } (Address: ${
         address.address
       }), but there was an error encountered => ${JSON.stringify(
         error
