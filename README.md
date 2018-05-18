@@ -4,6 +4,11 @@
   - This is the REST API for the IL, with endpoints for getting the `Participating Systems`, `Message Types`,<br/>
    `Message Subscriptions`, `Usage Stats` and `Notifications`
 
+## ESLint
+- After running `npm i`, run the following command to setup eslint:
+    
+    `node node_modules\\eslint\\bin\\eslint.js --init`
+
 ## Setup steps
   - First you need to install `nodejs` and [pm2](http://pm2.keymetrics.io/)
   - To create a build, run the following:

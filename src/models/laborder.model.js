@@ -1,7 +1,7 @@
-"use strict";
+'use strict'
 
-module.exports = function(sequelize, DataTypes) {
-  let LabOrder = sequelize.define("LabOrder", {
+module.exports = function (sequelize, DataTypes) {
+  let LabOrder = sequelize.define('LabOrder', {
     orderNumber: {
       type: DataTypes.STRING(40),
       allowNull: false,
@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     gender: {
-      type:   DataTypes.ENUM,
+      type: DataTypes.ENUM,
       values: ['M', 'F']
     },
     age: {
@@ -28,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     ageUnit: {
-      type:   DataTypes.ENUM,
+      type: DataTypes.ENUM,
       values: ['YEARS', 'MONTHS', 'DAYS'],
       defaultValue: 'YEARS'
     },
@@ -55,7 +55,7 @@ module.exports = function(sequelize, DataTypes) {
     requestTransferredDate: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
-    },
+    }
   }, {
     timestamps: false
   })

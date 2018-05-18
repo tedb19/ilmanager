@@ -1,81 +1,51 @@
 {
   "server": {
     "app": {
-      "slogan": "Interoperability Layer for the HIS projects"
+      "description": "Interoperability Layer for the HIS projects"
+    },
+    "connections": {
+      "router": {
+        "isCaseSensitive": true,
+        "stripTrailingSlash": true
+      }
     }
   },
   "connections": [
     {
       "port": 5000,
-      "labels": ["web-ui", "IL"]
+      "labels": ["web-ui"]
     },
     {
       "port": 3003,
-      "labels": ["api", "IL"]
+      "labels": ["IL"]
     },
     {
       "port": 3007,
       "labels": ["VL"]
+    },
+    {
+      "port": 9721,
+      "labels": ["DAD"]
     }
   ],
   "registrations": [
+    { "plugin": { "register": "blipp" } },
+    { "plugin": { "register": "inert" } },
+    { "plugin": { "register": "vision" } },
     {
-      "plugin": {
-        "register": "good",
-        "options": {
-          "ops": {
-            "interval": "600000"
-        },
-          "reporters": {
-            "console": [
-              {
-                "module": "good-squeeze",
-                "name": "Squeeze",
-                "args": [{
-                  "log": "*",
-                  "response": "*"
-                }]
-              },{
-                "module": "good-console"
-              }, "stdout" 
-            ],
-            "file": [
-              {
-                "module": "good-squeeze",
-                "name": "Squeeze",
-                "args": [{ "ops": "*", "log": "*", "response": "*", "request": "*", "error": "*" }]
-              },
-              {
-                "module": "good-squeeze",
-                "name": "SafeJson",
-                "args": [ null, { "separator": ",\n" } ]
-              },
-              {
-                "module": "rotating-file-stream",
-                "args": [
-                  "ops_log.json",
-                  {
-                    "size": "300K",
-                    "path": "./logs"
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      }
+      "plugin": { "register": "lout", "options": { "endpoint": "/api/docs" } }
     },
-    { "plugin": "blipp" },
-    { "plugin": "inert" },
-    { "plugin": "vision" },
-    { "plugin": "lout", "options": { "endpoint": "/api/docs" }},
-    //routes
-    { "plugin": "../routes/addressmapping.routes"},
-    { "plugin": "../routes/entity.routes"},
-    { "plugin": "../routes/logs.routes"},
-    { "plugin": "../routes/messagetype.routes"},
-    { "plugin": "../routes/stats.routes"},
-    { "plugin": "../routes/subscriber.routes"},
-    { "plugin": "../routes/web.routes"}
+    { "plugin": { "register": "../routes/IL/addressmapping.routes" } },
+    { "plugin": { "register": "../routes/IL/entity.routes" } },
+    { "plugin": { "register": "../routes/IL/logs.routes" } },
+    { "plugin": { "register": "../routes/IL/messagetype.routes" } },
+    { "plugin": { "register": "../routes/IL/queue.routes" } },
+    { "plugin": { "register": "../routes/IL/settings.routes" } },
+    { "plugin": { "register": "../routes/IL/stats.routes" } },
+    { "plugin": { "register": "../routes/IL/subscriber.routes" } },
+    { "plugin": { "register": "../routes/VL/laborder.routes" } },
+    { "plugin": { "register": "../routes/VL/labresult.routes" } },
+    { "plugin": { "register": "../routes/DAD/dad.routes" } },
+    { "plugin": { "register": "../routes/web-ui/web.routes" } }
   ]
 }

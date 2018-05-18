@@ -1,7 +1,7 @@
-"use strict";
+'use strict'
 
-module.exports = function(sequelize, DataTypes) {
-  let MessageType = sequelize.define("MessageType", {
+module.exports = function (sequelize, DataTypes) {
+  let MessageType = sequelize.define('MessageType', {
     name: {
       type: DataTypes.STRING(10),
       allowNull: false,
@@ -15,15 +15,15 @@ module.exports = function(sequelize, DataTypes) {
     description: DataTypes.TEXT,
     template: DataTypes.TEXT,
     status: {
-        type:   DataTypes.ENUM,
-        values: ['ACTIVE', 'INACTIVE'],
-        defaultValue: 'ACTIVE'
+      type: DataTypes.ENUM,
+      values: ['ACTIVE', 'INACTIVE'],
+      defaultValue: 'ACTIVE'
     }
   })
 
-  MessageType.associate = function(models) {
-    MessageType.belongsToMany(models.Entity, {through: models.Subscriber})
+  MessageType.associate = function (models) {
+    MessageType.belongsToMany(models.Entity, { through: models.Subscriber })
   }
-  
+
   return MessageType
 }
