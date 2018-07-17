@@ -84,13 +84,16 @@ exports.register = (server, options, next) => {
       let page = request.params.page // page number
       let limit = 10 // number of records per page
       let offset = page * limit
-      const searchTerm = request.params.searchTerm
       // TODO: Split the searchTerm with ' '  and search with OR in the where clause
-      searchTerm.split(' ').map(term => {})
+      // searchTerm.split(' ').map(term => {})
       models.Logs.findAndCountAll({
         limit: limit,
         offset: offset,
-        where: { log: { [models.Sequelize.Op.like]: '%' + request.params.searchTerm + '%' } },
+        where: {
+          log: {
+            $like: '%' + request.params.searchTerm + '%'
+          }
+        },
         order: [['id', 'DESC']],
         $sort: { id: 1 }
       })
@@ -101,7 +104,9 @@ exports.register = (server, options, next) => {
           reply({ result: logs, count: data.count, pages: pages })
         })
         .catch(error => {
-          logger.error(`Error searching for logs by search term and page: ${error}`)
+          logger.error(
+            `Error searching for logs by search term and page: ${error}`
+          )
           reply(Boom.badImplementation)
         })
     },
@@ -121,14 +126,20 @@ exports.register = (server, options, next) => {
     method: 'GET',
     handler: async (request, reply) => {
       const [logsCount] = await models.Logs.findAll({
-        attributes: [[models.sequelize.fn('COUNT', models.sequelize.col('id')), 'total']]
+        attributes: [
+          [models.sequelize.fn('COUNT', models.sequelize.col('id')), 'total']
+        ]
       })
       const [queuedLogsCount] = await models.Logs.findAll({
-        attributes: [[models.sequelize.fn('COUNT', models.sequelize.col('id')), 'queued']],
+        attributes: [
+          [models.sequelize.fn('COUNT', models.sequelize.col('id')), 'queued']
+        ],
         where: { level: 'WARNING' }
       })
       const [sentLogsCount] = await models.Logs.findAll({
-        attributes: [[models.sequelize.fn('COUNT', models.sequelize.col('id')), 'sent']],
+        attributes: [
+          [models.sequelize.fn('COUNT', models.sequelize.col('id')), 'sent']
+        ],
         where: { level: 'INFO' }
       })
       reply({

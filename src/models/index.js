@@ -5,18 +5,37 @@ import path from 'path'
 import Sequelize from 'sequelize'
 
 const env = process.env.NODE_ENV || 'development'
-const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env]
+const platform = process.env.PLATFORM || 'windows'
 
-const prodConfig = {
+const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env]
+const defaults = {
   username: process.env.USERNAME_PROP,
   password: process.env.PASSWORD_PROP,
   database: process.env.DATABASE_PROP,
   host: 'localhost',
-  dialect: 'mssql',
-  logging: false,
+  logging: true,
   operatorsAliases: false,
-  options: {
-    instanceName: process.env.SERVER_PROP
+  pool: {
+    max: 10,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
+}
+
+let prodConfig = {}
+if (platform === 'windows') {
+  prodConfig = {
+    ...defaults,
+    dialect: 'mssql',
+    options: {
+      instanceName: process.env.SERVER_PROP
+    }
+  }
+} else {
+  prodConfig = {
+    ...defaults,
+    dialect: 'mysql'
   }
 }
 
@@ -31,8 +50,7 @@ const sequelize = process.env.USERNAME_PROP
 
 const db = {}
 
-fs
-  .readdirSync(__dirname)
+fs.readdirSync(__dirname)
   .filter(file => file.indexOf('.') !== 0 && file !== 'index.js')
   .forEach(file => {
     var model = sequelize.import(path.join(__dirname, file))

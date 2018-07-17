@@ -1,7 +1,7 @@
 import Boom from 'boom'
 
 import models from '../../models'
-import { getActiveEntities } from '../../logic/stats.logic'
+import { getActiveEntities } from '../../lib/stats.logic'
 import { logger } from '../../utils/logger.utils'
 
 exports.register = (server, options, next) => {
@@ -67,7 +67,9 @@ exports.register = (server, options, next) => {
     method: 'GET',
     handler: async (request, reply) => {
       try {
-        const address = await models.AddressMapping.findAll({ where: { EntityId: request.params.id } })
+        const address = await models.AddressMapping.findAll({
+          where: { EntityId: request.params.id }
+        })
         address ? reply(address) : reply({})
       } catch (error) {
         logger.error(`Error fetching address by id: ${error}`)
@@ -90,9 +92,14 @@ exports.register = (server, options, next) => {
     method: 'POST',
     handler: async (request, reply) => {
       try {
-        const data = request.payload.protocol === 'HTTP' && !request.payload.address.includes('http')
-          ? {...request.payload, address: `http://${request.payload.address}`}
-          : request.payload
+        const data =
+          request.payload.protocol === 'HTTP' &&
+          !request.payload.address.includes('http')
+            ? {
+              ...request.payload,
+              address: `http://${request.payload.address}`
+            }
+            : request.payload
         const addressMapping = await models.AddressMapping.create(data)
         addressMapping ? reply(addressMapping) : reply(Boom.notFound)
       } catch (error) {
@@ -119,8 +126,10 @@ exports.register = (server, options, next) => {
         const addressMappingId = request.params.id
         let postBody = request.payload
         const address = postBody.address
-        address ? postBody.status = 'ACTIVE' : postBody.status = 'INACTIVE'
-        const addressMapping = await models.AddressMapping.update(postBody, {where: { id: addressMappingId }})
+        address ? (postBody.status = 'ACTIVE') : (postBody.status = 'INACTIVE')
+        const addressMapping = await models.AddressMapping.update(postBody, {
+          where: { id: addressMappingId }
+        })
         addressMapping ? reply(addressMapping) : reply(Boom.notFound)
       } catch (error) {
         logger.error(`Error updating address: ${error}`)
@@ -144,7 +153,9 @@ exports.register = (server, options, next) => {
     handler: async (request, reply) => {
       const EntityId = request.params.entityId
       try {
-        const addressMapping = await models.AddressMapping.destroy({ where: { EntityId } })
+        const addressMapping = await models.AddressMapping.destroy({
+          where: { EntityId }
+        })
         reply(addressMapping)
       } catch (error) {
         logger.error(`Error deleting address: ${error}`)

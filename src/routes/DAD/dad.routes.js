@@ -27,7 +27,10 @@ exports.register = (server, options, next) => {
   })
 
   ILServer.ext('onRequest', function (request, reply) {
-    if (request.method === 'post' && request.headers['content-type'] === 'application/adx+xml') {
+    if (
+      request.method === 'post' &&
+      request.headers['content-type'] === 'application/adx+xml'
+    ) {
       request.setUrl('/api/adx')
     }
     return reply.continue()
@@ -39,7 +42,8 @@ exports.register = (server, options, next) => {
     handler: async (request, reply) => {
       let { payload } = request
       let log = {
-        log: 'ADX message successfully received by the Interoperability Layer (IL)',
+        log:
+          'ADX message successfully received by the Interoperability Layer (IL)',
         level: 'INFO'
       }
       await saveXMLToQueue(Buffer.from(payload).toString())

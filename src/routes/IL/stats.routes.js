@@ -1,7 +1,7 @@
 import Boom from 'boom'
 
 import models from '../../models'
-import { getEntitiesStatus } from '../../logic/stats.logic'
+import { getEntitiesStatus } from '../../lib/stats.logic'
 import { logger } from '../../utils/logger.utils'
 
 exports.register = (server, options, next) => {

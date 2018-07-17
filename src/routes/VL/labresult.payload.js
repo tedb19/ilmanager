@@ -1,23 +1,29 @@
 import dateFormat from 'dateformat'
 import models from '../../models'
 
-const processDate = (dateStr) => {
-  return (dateStr
-    ? dateFormat(new Date(dateStr), 'yyyyMMdd')
-    : '')
+const processDate = dateStr => {
+  return dateStr ? dateFormat(new Date(dateStr), 'yyyymmdd') : ''
 }
 
 const translateCode = async (type, key) => {
-  const labCodes = await models.LabCode.findAll({ where: { codeKey: key, codeType: type } })
+  const labCodes = await models.LabCode.findAll({
+    where: { codeKey: key, codeType: type }
+  })
   return labCodes.length ? labCodes[0].codeName : ''
 }
 
-export const generatePayload = async (labResult) => {
+export const generatePayload = async labResult => {
   const now = new Date()
   const VLMessage = {}
 
-  const sampleRejection = await translateCode('SAMPLE_REJECTION', labResult.sampleRejection)
-  const justification = await translateCode('JUSTIFICATION', labResult.justification)
+  const sampleRejection = await translateCode(
+    'SAMPLE_REJECTION',
+    labResult.sampleRejection
+  )
+  const justification = await translateCode(
+    'JUSTIFICATION',
+    labResult.justification
+  )
   const labTestedIn = await translateCode('LAB', labResult.lab)
   const sampleType = await translateCode('SAMPLE_TYPE', labResult.sampleType)
 
@@ -26,7 +32,7 @@ export const generatePayload = async (labResult) => {
     SENDING_FACILITY: labResult.mflCode,
     RECEIVING_APPLICATION: 'IL',
     RECEIVING_FACILITY: labResult.mflCode,
-    MESSAGE_DATETIME: dateFormat(now, 'yyyyMMddHHmmss'),
+    MESSAGE_DATETIME: dateFormat(now, 'yyyymmddHHMMss'),
     SECURITY: '',
     MESSAGE_TYPE: 'ORU^VL',
     PROCESSING_ID: 'P'

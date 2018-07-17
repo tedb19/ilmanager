@@ -1,7 +1,7 @@
 import Boom from 'boom'
 
 import models from '../../models'
-import { getSubscribedMessageTypes } from '../../logic/db.manipulation'
+import { getSubscribedMessageTypes } from '../../lib/db.manipulation'
 import { logger } from '../../utils/logger.utils'
 
 exports.register = (server, options, next) => {
@@ -13,10 +13,12 @@ exports.register = (server, options, next) => {
     handler: async (request, reply) => {
       try {
         const entities = await models.Entity.findAll({
-          include: [{
-            model: models.AddressMapping,
-            attributes: ['protocol', 'address', 'status', 'updatedAt']
-          }]
+          include: [
+            {
+              model: models.AddressMapping,
+              attributes: ['protocol', 'address', 'status', 'updatedAt']
+            }
+          ]
         })
         reply(entities)
       } catch (error) {
@@ -67,7 +69,9 @@ exports.register = (server, options, next) => {
     method: 'GET',
     handler: async (request, reply) => {
       try {
-        const [entity] = await models.Entity.findAll({ where: { name: request.params.entityName } })
+        const [entity] = await models.Entity.findAll({
+          where: { name: request.params.entityName }
+        })
         const messageTypes = await getSubscribedMessageTypes(entity)
         reply(messageTypes)
       } catch (error) {
@@ -76,9 +80,11 @@ exports.register = (server, options, next) => {
       }
     },
     config: {
-      description: 'Get the message types that the supplied entity subscribed to, including the status of the subscription',
-      tags: ['entity\'s subscriptions', 'participating system\'s message types'],
-      notes: 'should return the message types subscribed to by the supplied entity',
+      description:
+        'Get the message types that the supplied entity subscribed to, including the status of the subscription',
+      tags: ["entity's subscriptions", "participating system's message types"],
+      notes:
+        'should return the message types subscribed to by the supplied entity',
       cors: {
         origin: ['*'],
         additionalHeaders: ['cache-control', 'x-requested-with']
@@ -117,7 +123,9 @@ exports.register = (server, options, next) => {
       try {
         const entityId = request.params.id
         let postBody = request.payload
-        const entity = await models.Entity.update(postBody, { where: { id: entityId } })
+        const entity = await models.Entity.update(postBody, {
+          where: { id: entityId }
+        })
         entity ? reply(entity) : reply(Boom.notFound)
       } catch (error) {
         logger.error(`Error updating entity: ${error}`)

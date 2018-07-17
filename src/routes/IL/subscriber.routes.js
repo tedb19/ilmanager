@@ -1,7 +1,11 @@
 import Boom from 'boom'
 
 import models from '../../models'
-import { getSubscribedEntities, getMessageTypeObj, getSubscribedMessageTypes } from '../../logic/db.manipulation'
+import {
+  getSubscribedEntities,
+  getMessageTypeObj,
+  getSubscribedMessageTypes
+} from '../../lib/db.manipulation'
 import { logger } from '../../utils/logger.utils'
 
 exports.register = (server, options, next) => {
@@ -16,8 +20,14 @@ exports.register = (server, options, next) => {
         const messageSubscribers = []
         for (let messageType of messageTypes) {
           const subscribersObjs = await getSubscribedEntities(messageType)
-          const subscribers = subscribersObjs.map(subscriber => ({ name: subscriber.name, color: subscriber.color }))
-          messageSubscribers.push({ messageType: messageType.verboseName, subscribers })
+          const subscribers = subscribersObjs.map(subscriber => ({
+            name: subscriber.name,
+            color: subscriber.color
+          }))
+          messageSubscribers.push({
+            messageType: messageType.verboseName,
+            subscribers
+          })
         }
         reply(messageSubscribers)
       } catch (error) {
@@ -45,7 +55,9 @@ exports.register = (server, options, next) => {
         const messageSubscribers = []
         for (let entity of entities) {
           const messageTypesObjs = await getSubscribedMessageTypes(entity)
-          const messageTypes = messageTypesObjs.map(messageType => messageType.verboseName)
+          const messageTypes = messageTypesObjs.map(
+            messageType => messageType.verboseName
+          )
           messageSubscribers.push({ entity: entity.name, messageTypes })
         }
         reply(messageSubscribers)
@@ -55,7 +67,8 @@ exports.register = (server, options, next) => {
       }
     },
     config: {
-      description: 'Get the entities and the message types they\'ve subscribed to',
+      description:
+        "Get the entities and the message types they've subscribed to",
       tags: ['subscribers'],
       notes: 'should return all the message types, with all their subscribers',
       cors: {
@@ -79,7 +92,8 @@ exports.register = (server, options, next) => {
       }
     },
     config: {
-      description: 'Get the entities that have subscribed to a given message type',
+      description:
+        'Get the entities that have subscribed to a given message type',
       tags: ['subscription'],
       notes: 'should return all the message types',
       cors: {
@@ -93,9 +107,11 @@ exports.register = (server, options, next) => {
     path: '/api/subscribers',
     method: 'POST',
     handler: (request, reply) => {
-      models.Subscriber
-        .create(request.payload)
-        .then((messagetype) => messagetype ? reply(messagetype) : reply(Boom.notFound))
+      models.Subscriber.create(request.payload)
+        .then(
+          messagetype =>
+            messagetype ? reply(messagetype) : reply(Boom.notFound)
+        )
         .catch(error => {
           logger.error(`Error creating subscription: ${error}`)
           reply(Boom.badImplementation)
@@ -117,9 +133,13 @@ exports.register = (server, options, next) => {
     method: 'PUT',
     handler: (request, reply) => {
       const messageTypeId = request.params.id
-      models.Subscriber
-        .update(request.payload, {where: { id: messageTypeId }})
-        .then((messageType) => messageType ? reply(messageType) : reply(Boom.notFound))
+      models.Subscriber.update(request.payload, {
+        where: { id: messageTypeId }
+      })
+        .then(
+          messageType =>
+            messageType ? reply(messageType) : reply(Boom.notFound)
+        )
         .catch(error => {
           logger.error(`Error updating subscription: ${error}`)
           reply(Boom.badImplementation)
@@ -153,7 +173,8 @@ exports.register = (server, options, next) => {
       }
     },
     config: {
-      description: 'Delete the subscription matching the entity and the message type',
+      description:
+        'Delete the subscription matching the entity and the message type',
       tags: ['subscription', 'delete'],
       notes: 'should return the updated message type',
       cors: {

@@ -2,25 +2,21 @@
   "name": "interoperability-layer-api",
   "version": "1.0.0",
   "description": "The backend API for the IL(Interoperability Layer) Manager",
-  "main": "src/lib/index.js",
+  "main": "src/server/index.js",
   "scripts": {
     "commit": "git-cz",
-    "check-coverage":
-      "nyc check-coverage --statements 70 --branches 70 --functions 70 --lines 70",
+    "check-coverage": "nyc check-coverage --statements 70 --branches 70 --functions 70 --lines 70",
     "report-coverage": "cat ./coverage/lcov.info | codecov",
     "test:watch": "yarn test -- -w",
     "test": "mocha test/**/*.spec.js --recursive --require babel-register",
     "pretest": "set NODE_ENV=test",
     "cover": "nyc npm t",
-    "start":
-      "nodemon src/lib/index.js --ignore test/ --ignore './logs*.json' --watch src/* --exec babel-node --presets es2015,stage-3",
+    "start": "nodemon src/server/index.js --ignore test/ --ignore './logs*.json' --watch src/* --exec babel-node --presets es2015,stage-3",
     "prebuild": "rimraf dist",
-    "postbuild": "yarn install --force",
-    "build":
-      "babel --copy-files --out-dir dist/src src && npm run prep:dependencies",
-    "prep:dependencies":
-      "yarn install --production --ignore-scripts --prefer-offline && cp -Rf node_modules dist/node_modules --verbose",
-    "serve": "node dist/src/lib/index.js"
+    "postbuild": "cp -Rf build dist/ && tar -zcvf dist.tar.gz dist && yarn install --force",
+    "build": "babel --copy-files --out-dir dist/src src && npm run prep:dependencies",
+    "prep:dependencies": "yarn install --production --ignore-scripts --prefer-offline && cp -Rf node_modules dist/node_modules --verbose",
+    "serve": "node dist/src/server/index.js"
   },
   "author": "Teddy Odhiambo <tedb19@gmail.com>",
   "license": "ISC",
@@ -54,6 +50,7 @@
     "boom": "5.2.0",
     "bunyan": "1.8.12",
     "bunyan-format": "0.2.1",
+    "create-react-native-app": "1.0.0",
     "dateformat": "3.0.3",
     "es6-promise": "4.2.4",
     "glue": "4.0.0",
@@ -62,7 +59,9 @@
     "isomorphic-fetch": "2.2.1",
     "jsontoxml": "0.1.0",
     "lout": "10.0.2",
+    "mysql2": "1.5.3",
     "ping": "0.2.2",
+    "pm2": "2.10.4",
     "sequelize": "4.4.2",
     "tedious": "2.1.5",
     "vision": "4.1.1"
@@ -76,10 +75,18 @@
     }
   },
   "nodemonConfig": {
-    "ignore": ["logs*", "README.md"]
+    "ignore": [
+      "logs*",
+      "README.md"
+    ]
   },
   "babel": {
-    "presets": ["stage-3", "es2015"],
-    "plugins": ["transform-runtime"]
+    "presets": [
+      "stage-3",
+      "es2015"
+    ],
+    "plugins": [
+      "transform-runtime"
+    ]
   }
 }

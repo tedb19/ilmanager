@@ -3,17 +3,23 @@ import os from 'os'
 
 import Glue from 'glue'
 import { initializeDb } from '../seed'
-import { checkSystemsStatus } from '../logic/stats.logic'
-import { queueManager } from '../logic/queue.logic'
+import { checkSystemsStatus } from '../lib/stats.logic'
+import { queueManager } from '../lib/queue'
 import { logger } from '../utils/logger.utils'
 import { AppPorts } from '../config/constants'
 import { tcpServer } from '../routes/DAD/dad.tcp'
 
 import manifest from '../config/manifest.json'
+import { ZooKeeper } from '../lib/zookeeper'
 
 const options = {
   relativeTo: __dirname
 }
+
+process.on('unhandledRejection', err => {
+  logger.error(err)
+  process.exit(1)
+})
 
 if (cluster.isMaster) {
   initializeDb().then(
@@ -22,6 +28,7 @@ if (cluster.isMaster) {
       os.cpus().forEach(cpu => cluster.fork())
       checkSystemsStatus()
       queueManager()
+      ZooKeeper()
       logger.info(`Starting the Interoperability Layer...`)
     },
     error => {
@@ -30,10 +37,13 @@ if (cluster.isMaster) {
     }
   )
 } else {
-  Glue.compose(manifest, options).then(
+  Glue.compose(
+    manifest,
+    options
+  ).then(
     server => server.start(),
     error => {
-      logger.error(`An error occured when initializing the server: ${error}`)
+      logger.error(`An error occured when starting the server: ${error}`)
       process.exit(1)
     }
   )

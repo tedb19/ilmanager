@@ -2,7 +2,7 @@
   "development": {
     "username": "sa",
     "password": "c0nstella",
-    "database": "interopdb_dev",
+    "database": "interopdb",
     "host": "localhost",
     "dialect": "mssql",
     "logging": false,
