@@ -63,7 +63,7 @@
     "jsontoxml": "0.1.0",
     "lout": "10.0.2",
     "ping": "0.2.2",
-    "sequelize": "4.4.2",
+    "sequelize": "5.3.0",
     "tedious": "2.1.5",
     "vision": "4.1.1"
   },
